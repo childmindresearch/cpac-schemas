@@ -15,7 +15,6 @@
 3. Write config with autocomplete, error detection, inline documentation, ...
 
 ```YAML
-```YAML
 # yaml-language-server: $schema=https://nx10.github.io/cpac-schemas/schemas/cpac.pipeline.1.8.6.dev.json
 %YAML 1.1
 ---
