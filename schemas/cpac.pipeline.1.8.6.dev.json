@@ -343,33 +343,69 @@
     },
     "longitudinal_template_generation": {
       "type": "object",
+      "description": "If you have multiple T1w's, you can generate your own run-specific custom T1w template to serve as an intermediate to the standard template for anatomical registration.",
       "additionalProperties": false,
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "This runs before the main pipeline as it requires multiple T1w sessions at once."
         },
         "average_method": {
-          "type": "string"
+          "type": "string",
+          "description": "Freesurfer longitudinal template algorithm using FSL FLIRT Method to average the dataset at each iteration of the template creation\nOptions: median, mean or std",
+          "enum": [
+            "median",
+            "mean",
+            "std"
+          ]
         },
         "dof": {
-          "type": "number"
+          "type": "integer",
+          "description": "Degree of freedom for FLIRT in the template creation\nOptions: 12 (affine), 9 (traditional), 7 (global rescale) or 6 (rigid body)",
+          "enum": [
+            12,
+            9,
+            7,
+            6
+          ]
         },
         "interp": {
-          "type": "string"
+          "type": "string",
+          "description": "Interpolation parameter for FLIRT in the template creation\nOptions: trilinear, nearestneighbour, sinc or spline",
+          "enum": [
+            "trilinear",
+            "nearestneighbour",
+            "sinc",
+            "spline"
+          ]
         },
         "cost": {
-          "type": "string"
+          "type": "string",
+          "description": "Cost function for FLIRT in the template creation\nOptions: corratio, mutualinfo, normmi, normcorr, leastsq, labeldiff or bbr",
+          "enum": [
+            "corratio",
+            "mutualinfo",
+            "normmi",
+            "normcorr",
+            "leastsq",
+            "labeldiff",
+            "bbr"
+          ]
         },
         "thread_pool": {
-          "type": "number"
+          "type": "integer",
+          "description": "Number of threads used for one run of the template generation algorithm"
         },
         "convergence_threshold": {
-          "type": "number"
+          "type": "number",
+          "description": "Threshold of transformation distance to consider that the loop converged\n(-1 means numpy.finfo(np.float64).eps and is the default)",
+          "default": -1
         }
       }
     },
     "anatomical_preproc": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "run": {
           "type": "boolean"
@@ -379,34 +415,48 @@
         },
         "non_local_means_filtering": {
           "type": "object",
+          "description": "Non-local means filtering via ANTs DenoiseImage",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "array",
+              "description": "this is a fork option",
               "items": {
                 "type": "boolean"
               }
             },
             "noise_model": {
-              "type": "string"
+              "type": "string",
+              "description": "options: 'Gaussian' or 'Rician'",
+              "enum": [
+                "Gaussian",
+                "Rician"
+              ]
             }
           }
         },
         "n4_bias_field_correction": {
           "type": "object",
+          "description": "N4 bias field correction via ANTs",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "array",
+              "description": "this is a fork option",
               "items": {
                 "type": "boolean"
               }
             },
             "shrink_factor": {
-              "type": "number"
+              "type": "integer",
+              "description": "An integer to resample the input image to save computation time. Shrink factors <= 4 are commonly used."
             }
           }
         },
         "t1t2_bias_field_correction": {
           "type": "object",
+          "description": "Bias field correction based on square root of T1w * T2w",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "boolean"
@@ -423,185 +473,259 @@
               "type": "boolean"
             },
             "run_before_preproc": {
-              "type": "boolean"
+              "type": "boolean",
+              "description": "Run ACPC alignment before non-local means filtering or N4 bias correction"
             },
             "brain_size": {
-              "type": "number"
+              "type": "number",
+              "description": "ACPC size of brain in z-dimension in mm.\nDefault: 150mm for human data."
             },
             "FOV_crop": {
-              "type": "string"
+              "type": "string",
+              "description": "Choose a tool to crop the FOV in ACPC alignment. Using FSL's robustfov or flirt command. \nDefault: robustfov for human data, flirt for monkey data.",
+              "enum": [
+                "robustfov",
+                "flirt"
+              ]
             },
             "acpc_target": {
-              "type": "string"
+              "type": "string",
+              "description": "ACPC Target\noptions: 'brain' or 'whole-head'\n  note: 'brain' requires T1w_brain_ACPC_template below to be populated",
+              "enum": [
+                "brain",
+                "whole-head"
+              ]
             },
             "align_brain_mask": {
-              "type": "boolean"
+              "type": "boolean",
+              "description": "Run ACPC alignment on brain mask \nIf the brain mask is in native space, turn it on\nIf the brain mask is ACPC aligned, turn it off"
             },
             "T1w_ACPC_template": {
-              "type": "string"
+              "type": "string",
+              "description": "ACPC aligned template"
             },
             "T1w_brain_ACPC_template": {
-              "type": "string"
+              "type": "string",
+              "description": "ACPC aligned template"
             },
             "T2w_ACPC_template": {
-              "type": "string"
+              "type": "string",
+              "description": "ACPC aligned template"
             },
             "T2w_brain_ACPC_template": {
-              "type": "string"
+              "type": "string",
+              "description": "ACPC aligned template"
             }
           }
         },
         "brain_extraction": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "boolean"
             },
             "using": {
               "type": "array",
+              "description": "using: ['3dSkullStrip', 'BET', 'UNet', 'niworkflows-ants', 'FreeSurfer-ABCD', 'FreeSurfer-BET-Tight', 'FreeSurfer-BET-Loose']\nthis is a fork option",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "3dSkullStrip",
+                  "BET",
+                  "UNet",
+                  "niworkflows-ants",
+                  "FreeSurfer-ABCD",
+                  "FreeSurfer-BET-Tight",
+                  "FreeSurfer-BET-Loose"
+                ]
               }
             },
             "AFNI-3dSkullStrip": {
               "type": "object",
+              "description": "option parameters",
+              "additionalProperties": false,
               "properties": {
                 "mask_vol": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Output a mask volume instead of a skull-stripped volume. The mask volume containes 0 to 6, which represents voxel's postion. If set to True, C-PAC will use this output to generate anatomical brain mask for further analysis."
                 },
                 "shrink_factor": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Set the threshold value controlling the brain vs non-brain voxels. Default is 0.6."
                 },
                 "var_shrink_fac": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Vary the shrink factor at every iteration of the algorithm. This prevents the likelihood of surface getting stuck in large pools of CSF before reaching the outer surface of the brain. Default is On."
                 },
                 "shrink_factor_bot_lim": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "The shrink factor bottom limit sets the lower threshold when varying the shrink factor. Default is 0.4, for when edge detection is used (which is On by default), otherwise the default value is 0.65."
                 },
                 "avoid_vent": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Avoids ventricles while skullstripping."
                 },
                 "n_iterations": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Set the number of iterations. Default is 250.The number of iterations should depend upon the density of your mesh."
                 },
                 "pushout": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "While expanding, consider the voxels above and not only the voxels below"
                 },
                 "touchup": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Perform touchup operations at the end to include areas not covered by surface expansion."
                 },
                 "fill_hole": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Give the maximum number of pixels on either side of the hole that can be filled. The default is 10 only if 'Touchup' is On - otherwise, the default is 0."
                 },
                 "NN_smooth": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Perform nearest neighbor coordinate interpolation every few iterations. Default is 72."
                 },
                 "smooth_final": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Perform final surface smoothing after all iterations. Default is 20."
                 },
                 "avoid_eyes": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Avoid eyes while skull stripping. Default is On."
                 },
                 "use_edge": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Use edge detection to reduce leakage into meninges and eyes. Default is On."
                 },
                 "exp_frac": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Speed of expansion."
                 },
                 "push_to_edge": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Perform aggressive push to edge. This might cause leakage. Default is Off."
                 },
                 "use_skull": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Use outer skull to limit expansion of surface into the skull in case of very strong shading artifacts. Use this only if you have leakage into the skull."
                 },
                 "perc_int": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Percentage of segments allowed to intersect surface. It is typically a number between 0 and 0.1, but can include negative values (which implies no testing for intersection)."
                 },
                 "max_inter_iter": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Number of iterations to remove intersection problems. With each iteration, the program automatically increases the amount of smoothing to get rid of intersections. Default is 4."
                 },
                 "fac": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Multiply input dataset by FAC if range of values is too small."
                 },
                 "blur_fwhm": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Blur dataset after spatial normalization. Recommended when you have lots of CSF in brain and when you have protruding gyri (finger like). If so, recommended value range is 2-4. Otherwise, leave at 0."
                 },
                 "monkey": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Set it as True if processing monkey data with AFNI"
                 }
               }
             },
             "FSL-BET": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "frac": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Set the threshold value controling the brain vs non-brain voxels, default is 0.5"
                 },
                 "mask_boolean": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Mask created along with skull stripping. It should be `On`, if selected functionalMasking :  ['Anatomical_Refined'] and `FSL` as skull-stripping method."
                 },
                 "mesh_boolean": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Mesh created along with skull stripping"
                 },
                 "outline": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Create a surface outline image"
                 },
                 "padding": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Add padding to the end of the image, improving BET.Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces"
                 },
                 "radius": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Integer value of head radius"
                 },
                 "reduce_bias": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Reduce bias and cleanup neck. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces"
                 },
                 "remove_eyes": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Eyes and optic nerve cleanup. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces"
                 },
                 "robust": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Robust brain center estimation. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces"
                 },
                 "skull": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Create a skull image"
                 },
                 "surfaces": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Gets additional skull and scalp surfaces by running bet2 and betsurf. This is mutually exclusive with reduce_bias, robust, padding, remove_eyes"
                 },
                 "threshold": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Apply thresholding to segmented brain image and mask"
                 },
                 "vertical_gradient": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Vertical gradient in fractional intensity threshold (-1,1)"
                 }
               }
             },
             "UNet": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "unet_model": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "UNet model"
                 }
               }
             },
             "niworkflows-ants": {
               "type": "object",
+              "description": "Template to be used during niworkflows-ants. It is not necessary to change this path unless you intend to use a non-standard template.",
+              "additionalProperties": false,
               "properties": {
                 "template_path": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "niworkflows-ants Brain extraction template"
                 },
                 "mask_path": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "niworkflows-ants probability mask"
                 },
                 "regmask_path": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "niworkflows-ants registration mask (can be optional)"
                 }
               }
             },
             "FreeSurfer-BET": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "T1w_brain_template_mask_ccs": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Template to be used for FreeSurfer-BET brain extraction in CCS-options pipeline"
                 }
               }
             }
