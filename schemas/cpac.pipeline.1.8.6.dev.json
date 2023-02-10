@@ -13,7 +13,8 @@
       "properties": {
         "pipeline_name": {
           "type": "string",
-          "description": "Name for this pipeline configuration - useful for identification. This string will be sanitized and used in filepaths."
+          "description": "Name for this pipeline configuration - useful for identification. This string will be sanitized and used in filepaths.",
+          "default": "cpac-default-pipeline"
         },
         "output_directory": {
           "type": "object",
@@ -21,23 +22,28 @@
           "properties": {
             "path": {
               "type": "string",
-              "description": "Directory where C-PAC should write out processed data, logs, and crash reports.\n - If running in a container (Singularity/Docker), you can simply set this to an arbitrary name like '/outputs', and then map (-B/-v) your desired output directory to that label.\n - If running outside a container, this should be a full path to a directory."
+              "description": "Directory where C-PAC should write out processed data, logs, and crash reports.\n - If running in a container (Singularity/Docker), you can simply set this to an arbitrary name like '/outputs', and then map (-B/-v) your desired output directory to that label.\n - If running outside a container, this should be a full path to a directory.",
+              "default": "/outputs/output"
             },
             "source_outputs_dir": {
               "type": "string",
-              "description": "(Optional) Path to a BIDS-Derivatives directory that already has outputs.\n  - This option is intended to ingress already-existing resources from an output directory without writing new outputs back into the same directory.\n  - If provided, C-PAC will ingress the already-computed outputs from this directory and continue the pipeline from where they leave off.\n  - If left as 'None', C-PAC will ingress any already-computed outputs from the output directory you provide above in 'path' instead, the default behavior."
+              "description": "(Optional) Path to a BIDS-Derivatives directory that already has outputs.\n  - This option is intended to ingress already-existing resources from an output directory without writing new outputs back into the same directory.\n  - If provided, C-PAC will ingress the already-computed outputs from this directory and continue the pipeline from where they leave off.\n  - If left as 'None', C-PAC will ingress any already-computed outputs from the output directory you provide above in 'path' instead, the default behavior.",
+              "default": "None"
             },
             "pull_source_once": {
               "type": "boolean",
-              "description": "Set to True to make C-PAC ingress the outputs from the primary output directory if they exist, even if a source_outputs_dir is provided\n  - Setting to False will pull from source_outputs_dir every time, over-writing any calculated outputs in the main output directory\n  - C-PAC will still pull from source_outputs_dir if the main output directory is empty, however"
+              "description": "Set to True to make C-PAC ingress the outputs from the primary output directory if they exist, even if a source_outputs_dir is provided\n  - Setting to False will pull from source_outputs_dir every time, over-writing any calculated outputs in the main output directory\n  - C-PAC will still pull from source_outputs_dir if the main output directory is empty, however",
+              "default": true
             },
             "write_func_outputs": {
               "type": "boolean",
-              "description": "Include extra versions and intermediate steps of functional preprocessing in the output directory."
+              "description": "Include extra versions and intermediate steps of functional preprocessing in the output directory.",
+              "default": false
             },
             "write_debugging_outputs": {
               "type": "boolean",
-              "description": "Include extra outputs in the output directory that may be of interest when more information is needed."
+              "description": "Include extra outputs in the output directory that may be of interest when more information is needed.",
+              "default": false
             },
             "output_tree": {
               "type": "string",
@@ -45,7 +51,8 @@
                 "default",
                 "ndmg"
               ],
-              "description": "Output directory format and structure.\nOptions: default, ndmg"
+              "description": "Output directory format and structure.\nOptions: default, ndmg",
+              "default": "default"
             },
             "quality_control": {
               "type": "object",
@@ -54,11 +61,13 @@
               "properties": {
                 "generate_quality_control_images": {
                   "type": "boolean",
-                  "description": "Generate quality control pages containing preprocessing and derivative outputs."
+                  "description": "Generate quality control pages containing preprocessing and derivative outputs.",
+                  "default": true
                 },
                 "generate_xcpqc_files": {
                   "type": "boolean",
-                  "description": "Generate eXtensible Connectivity Pipeline-style quality control files"
+                  "description": "Generate eXtensible Connectivity Pipeline-style quality control files",
+                  "default": false
                 }
               }
             }
@@ -69,11 +78,13 @@
           "properties": {
             "path": {
               "type": "string",
-              "description": "Directory where C-PAC should store temporary and intermediate files.\n - This directory must be saved if you wish to re-run your pipeline from where you left off (if not completed).\n - NOTE: As it stores all intermediate files, this directory can grow to become very large, especially for data with a large amount of TRs.\n - If running in a container (Singularity/Docker), you can simply set this to an arbitrary name like '/work', and then map (-B/-v) your desired output directory to that label.\n - If running outside a container, this should be a full path to a directory.\n - This can be written to '/tmp' if you do not intend to save your working directory."
+              "description": "Directory where C-PAC should store temporary and intermediate files.\n - This directory must be saved if you wish to re-run your pipeline from where you left off (if not completed).\n - NOTE: As it stores all intermediate files, this directory can grow to become very large, especially for data with a large amount of TRs.\n - If running in a container (Singularity/Docker), you can simply set this to an arbitrary name like '/work', and then map (-B/-v) your desired output directory to that label.\n - If running outside a container, this should be a full path to a directory.\n - This can be written to '/tmp' if you do not intend to save your working directory.",
+              "default": "/outputs/working"
             },
             "remove_working_dir": {
               "type": "boolean",
-              "description": "Deletes the contents of the Working Directory after running. This saves disk space, but any additional preprocessing or analysis will have to be completely re-run."
+              "description": "Deletes the contents of the Working Directory after running. This saves disk space, but any additional preprocessing or analysis will have to be completely re-run.",
+              "default": true
             }
           }
         },
@@ -82,10 +93,12 @@
           "properties": {
             "run_logging": {
               "type": "boolean",
-              "description": "Whether to write log details of the pipeline run to the logging files."
+              "description": "Whether to write log details of the pipeline run to the logging files.",
+              "default": true
             },
             "path": {
-              "type": "string"
+              "type": "string",
+              "default": "/outputs/logs"
             },
             "graphviz": {
               "type": "object",
@@ -97,7 +110,8 @@
                   "properties": {
                     "generate": {
                       "type": "boolean",
-                      "description": "Whether to generate the graph visualization"
+                      "description": "Whether to generate the graph visualization",
+                      "default": false
                     },
                     "graph2use": {
                       "type": "array",
@@ -126,7 +140,8 @@
                     },
                     "simple_form": {
                       "type": "boolean",
-                      "description": "The node name will be displayed in the form `nodename (package)` when On or `nodename.Class.package` when Off"
+                      "description": "The node name will be displayed in the form `nodename (package)` when On or `nodename.Class.package` when Off",
+                      "default": true
                     }
                   }
                 }
@@ -140,7 +155,8 @@
           "properties": {
             "path": {
               "type": "string",
-              "description": "Directory where CPAC should write crash logs."
+              "description": "Directory where CPAC should write crash logs.",
+              "default": "/outputs/crash"
             }
           }
         },
@@ -149,7 +165,8 @@
           "properties": {
             "fail_fast": {
               "type": "boolean",
-              "description": "Stop worklow execution on first crash?"
+              "description": "Stop worklow execution on first crash?",
+              "default": false
             },
             "random_seed": {
               "description": "Random seed used to fix the state of execution.\nIf unset, each process uses its own default.\nIf set, a `random.log` file will be generated logging the random seed and each node to which that seed was applied.\nIf set to a positive integer (up to 2147483647), that integer will be used to seed each process that accepts a random seed.\nIf set to 'random', a random positive integer (up to 2147483647) will be generated and that seed will be used to seed each process that accepts a random seed.",
@@ -174,7 +191,8 @@
               "additionalProperties": false,
               "properties": {
                 "run": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "resource_manager": {
                   "type": "string",
@@ -183,18 +201,21 @@
                     "SGE",
                     "PBS",
                     "SLURM"
-                  ]
+                  ],
+                  "default": "SGE"
                 },
                 "SGE": {
                   "type": "object",
                   "properties": {
                     "parallel_environment": {
                       "type": "string",
-                      "description": "SGE Parallel Environment to use when running CPAC.\nOnly applies when you are running on a grid or compute cluster using SGE."
+                      "description": "SGE Parallel Environment to use when running CPAC.\nOnly applies when you are running on a grid or compute cluster using SGE.",
+                      "default": "mpi_smp"
                     },
                     "queue": {
                       "type": "string",
-                      "description": "SGE Queue to use when running CPAC.\nOnly applies when you are running on a grid or compute cluster using SGE."
+                      "description": "SGE Queue to use when running CPAC.\nOnly applies when you are running on a grid or compute cluster using SGE.",
+                      "default": "all.q"
                     }
                   }
                 }
@@ -202,11 +223,13 @@
             },
             "maximum_memory_per_participant": {
               "type": "number",
-              "description": "The maximum amount of memory each participant's workflow can allocate. Use this to place an upper bound of memory usage.\n- Warning: 'Memory Per Participant' multiplied by 'Number of Participants to Run Simultaneously' must not be more than the total amount of RAM.\n- Conversely, using too little RAM can impede the speed of a pipeline run.\n- It is recommended that you set this to a value that when multiplied by 'Number of Participants to Run Simultaneously' is as much RAM you can safely allocate."
+              "description": "The maximum amount of memory each participant's workflow can allocate. Use this to place an upper bound of memory usage.\n- Warning: 'Memory Per Participant' multiplied by 'Number of Participants to Run Simultaneously' must not be more than the total amount of RAM.\n- Conversely, using too little RAM can impede the speed of a pipeline run.\n- It is recommended that you set this to a value that when multiplied by 'Number of Participants to Run Simultaneously' is as much RAM you can safely allocate.",
+              "default": 1
             },
             "raise_insufficient": {
               "type": "boolean",
-              "description": "Prior to running a pipeline C-PAC makes a rough estimate of a worst-case-scenario maximum concurrent memory usage with high-resoltion data, raising an exception describing the recommended minimum memory allocation for the given configuration.\nTurning this option off will allow pipelines to run without allocating the recommended minimum, allowing for more efficient runs at the risk of out-of-memory crashes (use at your own risk)"
+              "description": "Prior to running a pipeline C-PAC makes a rough estimate of a worst-case-scenario maximum concurrent memory usage with high-resoltion data, raising an exception describing the recommended minimum memory allocation for the given configuration.\nTurning this option off will allow pipelines to run without allocating the recommended minimum, allowing for more efficient runs at the risk of out-of-memory crashes (use at your own risk)",
+              "default": true
             },
             "observed_usage": {
               "type": "object",
@@ -222,29 +245,35 @@
                 },
                 "buffer": {
                   "type": "number",
-                  "description": "Percent. E.g., `buffer: 10` would estimate 1.1 * the observed memory usage from the callback log provided in \"usage\". Can be overridden with the commandline flag `--runtime_buffer`."
+                  "description": "Percent. E.g., `buffer: 10` would estimate 1.1 * the observed memory usage from the callback log provided in \"usage\". Can be overridden with the commandline flag `--runtime_buffer`.",
+                  "default": 10
                 }
               }
             },
             "max_cores_per_participant": {
               "type": "integer",
-              "description": "The maximum amount of cores (on a single machine) or slots on a node (on a cluster/grid) to allocate per participant.\n- Setting this above 1 will parallelize each participant's workflow where possible. If you wish to dedicate multiple cores to ANTS-based anatomical registration (below), this value must be equal or higher than the amount of cores provided to ANTS.\n- The maximum number of cores your run can possibly employ will be this setting multiplied by the number of participants set to run in parallel (the 'Number of Participants to Run Simultaneously' setting)."
+              "description": "The maximum amount of cores (on a single machine) or slots on a node (on a cluster/grid) to allocate per participant.\n- Setting this above 1 will parallelize each participant's workflow where possible. If you wish to dedicate multiple cores to ANTS-based anatomical registration (below), this value must be equal or higher than the amount of cores provided to ANTS.\n- The maximum number of cores your run can possibly employ will be this setting multiplied by the number of participants set to run in parallel (the 'Number of Participants to Run Simultaneously' setting).",
+              "default": 1
             },
             "num_ants_threads": {
               "type": "integer",
-              "description": "The number of cores to allocate to ANTS-based anatomical registration per participant.\n- Multiple cores can greatly speed up this preprocessing step.\n- This number cannot be greater than the number of cores per participant."
+              "description": "The number of cores to allocate to ANTS-based anatomical registration per participant.\n- Multiple cores can greatly speed up this preprocessing step.\n- This number cannot be greater than the number of cores per participant.",
+              "default": 1
             },
             "num_OMP_threads": {
               "type": "integer",
-              "description": "The number of cores to allocate to processes that use OpenMP."
+              "description": "The number of cores to allocate to processes that use OpenMP.",
+              "default": 1
             },
             "num_participants_at_once": {
               "type": "integer",
-              "description": "The number of participant workflows to run at the same time.\n- The maximum number of cores your run can possibly employ will be this setting multiplied by the number of cores dedicated to each participant (the 'Maximum Number of Cores Per Participant' setting)."
+              "description": "The number of participant workflows to run at the same time.\n- The maximum number of cores your run can possibly employ will be this setting multiplied by the number of cores dedicated to each participant (the 'Maximum Number of Cores Per Participant' setting).",
+              "default": 1
             },
             "FSLDIR": {
               "type": "string",
-              "description": "Full path to the FSL version to be used by CPAC. If you have specified an FSL path in your .bashrc file, this path will be set automatically."
+              "description": "Full path to the FSL version to be used by CPAC. If you have specified an FSL path in your .bashrc file, this path will be set automatically.",
+              "default": "/usr/share/fsl/5.0"
             }
           }
         },
@@ -261,7 +290,8 @@
             },
             "s3_encryption": {
               "type": "boolean",
-              "description": "Enable server-side 256-AES encryption on data to the S3 bucket"
+              "description": "Enable server-side 256-AES encryption on data to the S3 bucket",
+              "default": false
             }
           }
         },
@@ -271,7 +301,8 @@
           "properties": {
             "verbose": {
               "type": "boolean",
-              "description": "Verbose developer messages."
+              "description": "Verbose developer messages.",
+              "default": false
             }
           }
         }
@@ -291,7 +322,8 @@
           "additionalProperties": false,
           "properties": {
             "run_reconall": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             "reconall_args": {
               "type": [
@@ -308,34 +340,44 @@
           "additionalProperties": false,
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             "subcortical_gray_labels": {
-              "type": "string"
+              "type": "string",
+              "default": "/opt/dcan-tools/pipeline/global/config/FreeSurferSubcorticalLabelTableLut.txt"
             },
             "freesurfer_labels": {
-              "type": "string"
+              "type": "string",
+              "default": "/opt/dcan-tools/pipeline/global/config/FreeSurferAllLut.txt"
             },
             "surf_atlas_dir": {
-              "type": "string"
+              "type": "string",
+              "default": "/opt/dcan-tools/pipeline/global/templates/standard_mesh_atlases"
             },
             "gray_ordinates_dir": {
-              "type": "string"
+              "type": "string",
+              "default": "/opt/dcan-tools/pipeline/global/templates/Greyordinates"
             },
             "gray_ordinates_res": {
-              "type": "number"
+              "type": "number",
+              "default": 2
             },
             "high_res_mesh": {
-              "type": "number"
+              "type": "number",
+              "default": 164
             },
             "low_res_mesh": {
-              "type": "number"
+              "type": "number",
+              "default": 32
             },
             "fmri_res": {
-              "type": "number"
+              "type": "number",
+              "default": 2
             },
             "smooth_fwhm": {
-              "type": "number"
+              "type": "number",
+              "default": 2
             }
           }
         }
@@ -348,7 +390,8 @@
       "properties": {
         "run": {
           "type": "boolean",
-          "description": "This runs before the main pipeline as it requires multiple T1w sessions at once."
+          "description": "This runs before the main pipeline as it requires multiple T1w sessions at once.",
+          "default": false
         },
         "average_method": {
           "type": "string",
@@ -357,7 +400,8 @@
             "median",
             "mean",
             "std"
-          ]
+          ],
+          "default": "median"
         },
         "dof": {
           "type": "integer",
@@ -367,7 +411,8 @@
             9,
             7,
             6
-          ]
+          ],
+          "default": 12
         },
         "interp": {
           "type": "string",
@@ -377,7 +422,8 @@
             "nearestneighbour",
             "sinc",
             "spline"
-          ]
+          ],
+          "default": "trilinear"
         },
         "cost": {
           "type": "string",
@@ -390,11 +436,13 @@
             "leastsq",
             "labeldiff",
             "bbr"
-          ]
+          ],
+          "default": "corratio"
         },
         "thread_pool": {
           "type": "integer",
-          "description": "Number of threads used for one run of the template generation algorithm"
+          "description": "Number of threads used for one run of the template generation algorithm",
+          "default": 2
         },
         "convergence_threshold": {
           "type": "number",
@@ -408,10 +456,12 @@
       "additionalProperties": false,
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "run_t2": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "non_local_means_filtering": {
           "type": "object",
@@ -431,7 +481,8 @@
               "enum": [
                 "Gaussian",
                 "Rician"
-              ]
+              ],
+              "default": "Gaussian"
             }
           }
         },
@@ -449,7 +500,8 @@
             },
             "shrink_factor": {
               "type": "integer",
-              "description": "An integer to resample the input image to save computation time. Shrink factors <= 4 are commonly used."
+              "description": "An integer to resample the input image to save computation time. Shrink factors <= 4 are commonly used.",
+              "default": 2
             }
           }
         },
@@ -459,10 +511,12 @@
           "additionalProperties": false,
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             "BiasFieldSmoothingSigma": {
-              "type": "number"
+              "type": "number",
+              "default": 5
             }
           }
         },
@@ -470,15 +524,18 @@
           "type": "object",
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             "run_before_preproc": {
               "type": "boolean",
-              "description": "Run ACPC alignment before non-local means filtering or N4 bias correction"
+              "description": "Run ACPC alignment before non-local means filtering or N4 bias correction",
+              "default": true
             },
             "brain_size": {
               "type": "number",
-              "description": "ACPC size of brain in z-dimension in mm.\nDefault: 150mm for human data."
+              "description": "ACPC size of brain in z-dimension in mm.\nDefault: 150mm for human data.",
+              "default": 150
             },
             "FOV_crop": {
               "type": "string",
@@ -486,7 +543,8 @@
               "enum": [
                 "robustfov",
                 "flirt"
-              ]
+              ],
+              "default": "robustfov"
             },
             "acpc_target": {
               "type": "string",
@@ -494,27 +552,33 @@
               "enum": [
                 "brain",
                 "whole-head"
-              ]
+              ],
+              "default": "whole-head"
             },
             "align_brain_mask": {
               "type": "boolean",
-              "description": "Run ACPC alignment on brain mask \nIf the brain mask is in native space, turn it on\nIf the brain mask is ACPC aligned, turn it off"
+              "description": "Run ACPC alignment on brain mask \nIf the brain mask is in native space, turn it on\nIf the brain mask is ACPC aligned, turn it off",
+              "default": false
             },
             "T1w_ACPC_template": {
               "type": "string",
-              "description": "ACPC aligned template"
+              "description": "ACPC aligned template",
+              "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_1mm.nii.gz"
             },
             "T1w_brain_ACPC_template": {
               "type": "string",
-              "description": "ACPC aligned template"
+              "description": "ACPC aligned template",
+              "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_1mm_brain.nii.gz"
             },
             "T2w_ACPC_template": {
               "type": "string",
-              "description": "ACPC aligned template"
+              "description": "ACPC aligned template",
+              "default": "None"
             },
             "T2w_brain_ACPC_template": {
               "type": "string",
-              "description": "ACPC aligned template"
+              "description": "ACPC aligned template",
+              "default": "None"
             }
           }
         },
@@ -523,7 +587,8 @@
           "additionalProperties": false,
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             },
             "using": {
               "type": "array",
@@ -548,87 +613,108 @@
               "properties": {
                 "mask_vol": {
                   "type": "boolean",
-                  "description": "Output a mask volume instead of a skull-stripped volume. The mask volume containes 0 to 6, which represents voxel's postion. If set to True, C-PAC will use this output to generate anatomical brain mask for further analysis."
+                  "description": "Output a mask volume instead of a skull-stripped volume. The mask volume containes 0 to 6, which represents voxel's postion. If set to True, C-PAC will use this output to generate anatomical brain mask for further analysis.",
+                  "default": false
                 },
                 "shrink_factor": {
                   "type": "number",
-                  "description": "Set the threshold value controlling the brain vs non-brain voxels. Default is 0.6."
+                  "description": "Set the threshold value controlling the brain vs non-brain voxels. Default is 0.6.",
+                  "default": 0.6
                 },
                 "var_shrink_fac": {
                   "type": "boolean",
-                  "description": "Vary the shrink factor at every iteration of the algorithm. This prevents the likelihood of surface getting stuck in large pools of CSF before reaching the outer surface of the brain. Default is On."
+                  "description": "Vary the shrink factor at every iteration of the algorithm. This prevents the likelihood of surface getting stuck in large pools of CSF before reaching the outer surface of the brain. Default is On.",
+                  "default": true
                 },
                 "shrink_factor_bot_lim": {
                   "type": "number",
-                  "description": "The shrink factor bottom limit sets the lower threshold when varying the shrink factor. Default is 0.4, for when edge detection is used (which is On by default), otherwise the default value is 0.65."
+                  "description": "The shrink factor bottom limit sets the lower threshold when varying the shrink factor. Default is 0.4, for when edge detection is used (which is On by default), otherwise the default value is 0.65.",
+                  "default": 0.4
                 },
                 "avoid_vent": {
                   "type": "boolean",
-                  "description": "Avoids ventricles while skullstripping."
+                  "description": "Avoids ventricles while skullstripping.",
+                  "default": true
                 },
                 "n_iterations": {
                   "type": "number",
-                  "description": "Set the number of iterations. Default is 250.The number of iterations should depend upon the density of your mesh."
+                  "description": "Set the number of iterations. Default is 250.The number of iterations should depend upon the density of your mesh.",
+                  "default": 250
                 },
                 "pushout": {
                   "type": "boolean",
-                  "description": "While expanding, consider the voxels above and not only the voxels below"
+                  "description": "While expanding, consider the voxels above and not only the voxels below",
+                  "default": true
                 },
                 "touchup": {
                   "type": "boolean",
-                  "description": "Perform touchup operations at the end to include areas not covered by surface expansion."
+                  "description": "Perform touchup operations at the end to include areas not covered by surface expansion.",
+                  "default": true
                 },
                 "fill_hole": {
                   "type": "number",
-                  "description": "Give the maximum number of pixels on either side of the hole that can be filled. The default is 10 only if 'Touchup' is On - otherwise, the default is 0."
+                  "description": "Give the maximum number of pixels on either side of the hole that can be filled. The default is 10 only if 'Touchup' is On - otherwise, the default is 0.",
+                  "default": 10
                 },
                 "NN_smooth": {
                   "type": "number",
-                  "description": "Perform nearest neighbor coordinate interpolation every few iterations. Default is 72."
+                  "description": "Perform nearest neighbor coordinate interpolation every few iterations. Default is 72.",
+                  "default": 72
                 },
                 "smooth_final": {
                   "type": "number",
-                  "description": "Perform final surface smoothing after all iterations. Default is 20."
+                  "description": "Perform final surface smoothing after all iterations. Default is 20.",
+                  "default": 20
                 },
                 "avoid_eyes": {
                   "type": "boolean",
-                  "description": "Avoid eyes while skull stripping. Default is On."
+                  "description": "Avoid eyes while skull stripping. Default is On.",
+                  "default": true
                 },
                 "use_edge": {
                   "type": "boolean",
-                  "description": "Use edge detection to reduce leakage into meninges and eyes. Default is On."
+                  "description": "Use edge detection to reduce leakage into meninges and eyes. Default is On.",
+                  "default": true
                 },
                 "exp_frac": {
                   "type": "number",
-                  "description": "Speed of expansion."
+                  "description": "Speed of expansion.",
+                  "default": 0.1
                 },
                 "push_to_edge": {
                   "type": "boolean",
-                  "description": "Perform aggressive push to edge. This might cause leakage. Default is Off."
+                  "description": "Perform aggressive push to edge. This might cause leakage. Default is Off.",
+                  "default": false
                 },
                 "use_skull": {
                   "type": "boolean",
-                  "description": "Use outer skull to limit expansion of surface into the skull in case of very strong shading artifacts. Use this only if you have leakage into the skull."
+                  "description": "Use outer skull to limit expansion of surface into the skull in case of very strong shading artifacts. Use this only if you have leakage into the skull.",
+                  "default": false
                 },
                 "perc_int": {
                   "type": "number",
-                  "description": "Percentage of segments allowed to intersect surface. It is typically a number between 0 and 0.1, but can include negative values (which implies no testing for intersection)."
+                  "description": "Percentage of segments allowed to intersect surface. It is typically a number between 0 and 0.1, but can include negative values (which implies no testing for intersection).",
+                  "default": 0
                 },
                 "max_inter_iter": {
                   "type": "number",
-                  "description": "Number of iterations to remove intersection problems. With each iteration, the program automatically increases the amount of smoothing to get rid of intersections. Default is 4."
+                  "description": "Number of iterations to remove intersection problems. With each iteration, the program automatically increases the amount of smoothing to get rid of intersections. Default is 4.",
+                  "default": 4
                 },
                 "fac": {
                   "type": "number",
-                  "description": "Multiply input dataset by FAC if range of values is too small."
+                  "description": "Multiply input dataset by FAC if range of values is too small.",
+                  "default": 1
                 },
                 "blur_fwhm": {
                   "type": "number",
-                  "description": "Blur dataset after spatial normalization. Recommended when you have lots of CSF in brain and when you have protruding gyri (finger like). If so, recommended value range is 2-4. Otherwise, leave at 0."
+                  "description": "Blur dataset after spatial normalization. Recommended when you have lots of CSF in brain and when you have protruding gyri (finger like). If so, recommended value range is 2-4. Otherwise, leave at 0.",
+                  "default": 0
                 },
                 "monkey": {
                   "type": "boolean",
-                  "description": "Set it as True if processing monkey data with AFNI"
+                  "description": "Set it as True if processing monkey data with AFNI",
+                  "default": false
                 }
               }
             },
@@ -638,55 +724,68 @@
               "properties": {
                 "frac": {
                   "type": "number",
-                  "description": "Set the threshold value controling the brain vs non-brain voxels, default is 0.5"
+                  "description": "Set the threshold value controling the brain vs non-brain voxels, default is 0.5",
+                  "default": 0.5
                 },
                 "mask_boolean": {
                   "type": "boolean",
-                  "description": "Mask created along with skull stripping. It should be `On`, if selected functionalMasking :  ['Anatomical_Refined'] and `FSL` as skull-stripping method."
+                  "description": "Mask created along with skull stripping. It should be `On`, if selected functionalMasking :  ['Anatomical_Refined'] and `FSL` as skull-stripping method.",
+                  "default": true
                 },
                 "mesh_boolean": {
                   "type": "boolean",
-                  "description": "Mesh created along with skull stripping"
+                  "description": "Mesh created along with skull stripping",
+                  "default": false
                 },
                 "outline": {
                   "type": "boolean",
-                  "description": "Create a surface outline image"
+                  "description": "Create a surface outline image",
+                  "default": false
                 },
                 "padding": {
                   "type": "boolean",
-                  "description": "Add padding to the end of the image, improving BET.Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces"
+                  "description": "Add padding to the end of the image, improving BET.Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces",
+                  "default": false
                 },
                 "radius": {
                   "type": "number",
-                  "description": "Integer value of head radius"
+                  "description": "Integer value of head radius",
+                  "default": 0
                 },
                 "reduce_bias": {
                   "type": "boolean",
-                  "description": "Reduce bias and cleanup neck. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces"
+                  "description": "Reduce bias and cleanup neck. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces",
+                  "default": false
                 },
                 "remove_eyes": {
                   "type": "boolean",
-                  "description": "Eyes and optic nerve cleanup. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces"
+                  "description": "Eyes and optic nerve cleanup. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces",
+                  "default": false
                 },
                 "robust": {
                   "type": "boolean",
-                  "description": "Robust brain center estimation. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces"
+                  "description": "Robust brain center estimation. Mutually exclusive with functional,reduce_bias,robust,padding,remove_eyes,surfaces",
+                  "default": true
                 },
                 "skull": {
                   "type": "boolean",
-                  "description": "Create a skull image"
+                  "description": "Create a skull image",
+                  "default": false
                 },
                 "surfaces": {
                   "type": "boolean",
-                  "description": "Gets additional skull and scalp surfaces by running bet2 and betsurf. This is mutually exclusive with reduce_bias, robust, padding, remove_eyes"
+                  "description": "Gets additional skull and scalp surfaces by running bet2 and betsurf. This is mutually exclusive with reduce_bias, robust, padding, remove_eyes",
+                  "default": false
                 },
                 "threshold": {
                   "type": "boolean",
-                  "description": "Apply thresholding to segmented brain image and mask"
+                  "description": "Apply thresholding to segmented brain image and mask",
+                  "default": false
                 },
                 "vertical_gradient": {
                   "type": "number",
-                  "description": "Vertical gradient in fractional intensity threshold (-1,1)"
+                  "description": "Vertical gradient in fractional intensity threshold (-1,1)",
+                  "default": 0.0
                 }
               }
             },
@@ -696,7 +795,8 @@
               "properties": {
                 "unet_model": {
                   "type": "string",
-                  "description": "UNet model"
+                  "description": "UNet model",
+                  "default": "s3://fcp-indi/resources/cpac/resources/Site-All-T-epoch_36.model"
                 }
               }
             },
@@ -707,15 +807,18 @@
               "properties": {
                 "template_path": {
                   "type": "string",
-                  "description": "niworkflows-ants Brain extraction template"
+                  "description": "niworkflows-ants Brain extraction template",
+                  "default": "/ants_template/oasis/T_template0.nii.gz"
                 },
                 "mask_path": {
                   "type": "string",
-                  "description": "niworkflows-ants probability mask"
+                  "description": "niworkflows-ants probability mask",
+                  "default": "/ants_template/oasis/T_template0_BrainCerebellumProbabilityMask.nii.gz"
                 },
                 "regmask_path": {
                   "type": "string",
-                  "description": "niworkflows-ants registration mask (can be optional)"
+                  "description": "niworkflows-ants registration mask (can be optional)",
+                  "default": "/ants_template/oasis/T_template0_BrainCerebellumRegistrationMask.nii.gz"
                 }
               }
             },
@@ -725,7 +828,8 @@
               "properties": {
                 "T1w_brain_template_mask_ccs": {
                   "type": "string",
-                  "description": "Template to be used for FreeSurfer-BET brain extraction in CCS-options pipeline"
+                  "description": "Template to be used for FreeSurfer-BET brain extraction in CCS-options pipeline",
+                  "default": "/ccs_template/MNI152_T1_1mm_first_brain_mask.nii.gz"
                 }
               }
             }
@@ -737,7 +841,8 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "tissue_segmentation": {
           "type": "object",
@@ -755,19 +860,23 @@
                   "type": "object",
                   "properties": {
                     "use": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "Auto"
                     },
                     "Custom": {
                       "type": "object",
                       "properties": {
                         "CSF_threshold_value": {
-                          "type": "number"
+                          "type": "number",
+                          "default": 0.95
                         },
                         "WM_threshold_value": {
-                          "type": "number"
+                          "type": "number",
+                          "default": 0.95
                         },
                         "GM_threshold_value": {
-                          "type": "number"
+                          "type": "number",
+                          "default": 0.95
                         }
                       }
                     }
@@ -777,19 +886,24 @@
                   "type": "object",
                   "properties": {
                     "run": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": true
                     },
                     "priors_path": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "$FSLDIR/data/standard/tissuepriors/2mm"
                     },
                     "WM_path": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "$priors_path/avg152T1_white_bin.nii.gz"
                     },
                     "GM_path": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "$priors_path/avg152T1_gray_bin.nii.gz"
                     },
                     "CSF_path": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "$priors_path/avg152T1_csf_bin.nii.gz"
                     }
                   }
                 }
@@ -805,13 +919,16 @@
                   }
                 },
                 "WHITE": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "$FSLDIR/data/standard/tissuepriors/2mm/avg152T1_white_bin.nii.gz"
                 },
                 "GRAY": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "$FSLDIR/data/standard/tissuepriors/2mm/avg152T1_gray_bin.nii.gz"
                 },
                 "CSF": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "$FSLDIR/data/standard/tissuepriors/2mm/avg152T1_csf_bin.nii.gz"
                 }
               }
             },
@@ -854,7 +971,8 @@
               "type": "object",
               "properties": {
                 "erode": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0
                 },
                 "CSF_label": {
                   "type": "array",
@@ -887,22 +1005,28 @@
           "type": "object",
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             },
             "resolution_for_anat": {
-              "type": "string"
+              "type": "string",
+              "default": "2mm"
             },
             "T1w_brain_template": {
-              "type": "string"
+              "type": "string",
+              "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain.nii.gz"
             },
             "T1w_template": {
-              "type": "string"
+              "type": "string",
+              "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}.nii.gz"
             },
             "T1w_brain_template_mask": {
-              "type": "string"
+              "type": "string",
+              "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask.nii.gz"
             },
             "reg_with_skull": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             },
             "registration": {
               "type": "object",
@@ -917,7 +1041,8 @@
                   "type": "object",
                   "properties": {
                     "use_lesion_mask": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "T1_registration": {
                       "type": "array",
@@ -1116,7 +1241,8 @@
                       }
                     },
                     "interpolation": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "LanczosWindowedSinc"
                     }
                   }
                 },
@@ -1124,31 +1250,40 @@
                   "type": "object",
                   "properties": {
                     "fnirt_config": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "T1_2_MNI152_2mm"
                     },
                     "ref_resolution": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "2mm"
                     },
                     "ref_mask": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_dil.nii.gz"
                     },
                     "FNIRT_T1w_brain_template": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "None"
                     },
                     "FNIRT_T1w_template": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "None"
                     },
                     "interpolation": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "sinc"
                     },
                     "identity_matrix": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "/usr/share/fsl/5.0/etc/flirtsch/ident.mat"
                     },
                     "ref_mask_res-2": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain_mask_dil.nii.gz"
                     },
                     "T1w_template_res-2": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm.nii.gz"
                     }
                   }
                 }
@@ -1158,10 +1293,12 @@
               "type": "object",
               "properties": {
                 "run": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "using": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "FSL"
                 }
               }
             }
@@ -1174,34 +1311,43 @@
               "type": "object",
               "properties": {
                 "run": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": true
                 },
                 "reference": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "brain"
                 },
                 "using": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "FSL"
                 },
                 "input": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "brain"
                 },
                 "interpolation": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "trilinear"
                 },
                 "cost": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "corratio"
                 },
                 "dof": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 6
                 },
                 "arguments": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "None"
                 },
                 "func_input_prep": {
                   "type": "object",
                   "properties": {
                     "reg_with_skull": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "input": {
                       "type": "array",
@@ -1213,7 +1359,8 @@
                       "type": "object",
                       "properties": {
                         "n4_correct_func": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "default": false
                         }
                       }
                     },
@@ -1221,7 +1368,8 @@
                       "type": "object",
                       "properties": {
                         "func_reg_input_volume": {
-                          "type": "number"
+                          "type": "number",
+                          "default": 0
                         }
                       }
                     }
@@ -1237,16 +1385,20 @@
                       }
                     },
                     "bbr_schedule": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "/usr/share/fsl/5.0/etc/flirtsch/bbr.sch"
                     },
                     "reference": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "whole-head"
                     },
                     "bbr_wm_map": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "probability_map"
                     },
                     "bbr_wm_mask_args": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "-thr 0.5 -bin"
                     }
                   }
                 }
@@ -1256,7 +1408,8 @@
               "type": "object",
               "properties": {
                 "run": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "using": {
                   "type": "array",
@@ -1265,10 +1418,12 @@
                   }
                 },
                 "EPI_template": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "s3://fcp-indi/resources/cpac/resources/epi_hbn.nii.gz"
                 },
                 "EPI_template_mask": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "None"
                 },
                 "ANTs": {
                   "type": "object",
@@ -1470,7 +1625,8 @@
                       }
                     },
                     "interpolation": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "LanczosWindowedSinc"
                     }
                   }
                 },
@@ -1478,13 +1634,16 @@
                   "type": "object",
                   "properties": {
                     "fnirt_config": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "T1_2_MNI152_2mm"
                     },
                     "interpolation": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "sinc"
                     },
                     "identity_matrix": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "/usr/share/fsl/5.0/etc/flirtsch/ident.mat"
                     }
                   }
                 }
@@ -1494,19 +1653,23 @@
               "type": "object",
               "properties": {
                 "run": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": true
                 },
                 "run_EPI": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "output_resolution": {
                   "type": "object",
                   "properties": {
                     "func_preproc_outputs": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "3mm"
                     },
                     "func_derivative_outputs": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "3mm"
                     }
                   }
                 },
@@ -1523,16 +1686,20 @@
                       "type": "object",
                       "properties": {
                         "T1w_brain_template_funcreg": {
-                          "type": "string"
+                          "type": "string",
+                          "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${func_resolution}_brain.nii.gz"
                         },
                         "T1w_template_funcreg": {
-                          "type": "string"
+                          "type": "string",
+                          "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${func_resolution}.nii.gz"
                         },
                         "T1w_brain_template_mask_funcreg": {
-                          "type": "string"
+                          "type": "string",
+                          "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${func_resolution}_brain_mask.nii.gz"
                         },
                         "T1w_template_for_resample": {
-                          "type": "string"
+                          "type": "string",
+                          "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz"
                         }
                       }
                     },
@@ -1540,13 +1707,16 @@
                       "type": "object",
                       "properties": {
                         "EPI_template_funcreg": {
-                          "type": "string"
+                          "type": "string",
+                          "default": "s3://fcp-indi/resources/cpac/resources/epi_hbn.nii.gz"
                         },
                         "EPI_template_mask_funcreg": {
-                          "type": "string"
+                          "type": "string",
+                          "default": "None"
                         },
                         "EPI_template_for_resample": {
-                          "type": "string"
+                          "type": "string",
+                          "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz"
                         }
                       }
                     }
@@ -1556,7 +1726,8 @@
                   "type": "object",
                   "properties": {
                     "interpolation": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "LanczosWindowedSinc"
                     }
                   }
                 },
@@ -1564,10 +1735,12 @@
                   "type": "object",
                   "properties": {
                     "interpolation": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "sinc"
                     },
                     "identity_matrix": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "/usr/share/fsl/5.0/etc/flirtsch/ident.mat"
                     }
                   }
                 },
@@ -1575,7 +1748,8 @@
                   "type": "object",
                   "properties": {
                     "using": {
-                      "type": "string"
+                      "type": "string",
+                      "default": "default"
                     }
                   }
                 }
@@ -1589,16 +1763,19 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "truncation": {
           "type": "object",
           "properties": {
             "start_tr": {
-              "type": "number"
+              "type": "number",
+              "default": 0
             },
             "stop_tr": {
-              "type": "string"
+              "type": "string",
+              "default": "None"
             }
           }
         },
@@ -1606,10 +1783,12 @@
           "type": "object",
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             "scaling_factor": {
-              "type": "number"
+              "type": "number",
+              "default": 10
             }
           }
         },
@@ -1634,10 +1813,12 @@
               }
             },
             "tpattern": {
-              "type": "string"
+              "type": "string",
+              "default": "None"
             },
             "tzero": {
-              "type": "string"
+              "type": "string",
+              "default": "None"
             }
           }
         },
@@ -1645,16 +1826,19 @@
           "type": "object",
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             },
             "motion_estimates": {
               "type": "object",
               "properties": {
                 "calculate_motion_first": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "calculate_motion_after": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": true
                 }
               }
             },
@@ -1671,7 +1855,8 @@
                   "type": "object",
                   "properties": {
                     "functional_volreg_twopass": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": true
                     }
                   }
                 },
@@ -1682,7 +1867,8 @@
                   }
                 },
                 "motion_correction_reference_volume": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0
                 }
               }
             },
@@ -1737,13 +1923,16 @@
               "type": "object",
               "properties": {
                 "fmap_skullstrip_option": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "BET"
                 },
                 "fmap_skullstrip_BET_frac": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0.5
                 },
                 "fmap_skullstrip_AFNI_threshold": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0.6
                 }
               }
             },
@@ -1751,46 +1940,60 @@
               "type": "object",
               "properties": {
                 "warpres": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 10
                 },
                 "subsamp": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 1
                 },
                 "fwhm": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 8
                 },
                 "miter": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 5
                 },
                 "lambda": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 1
                 },
                 "ssqlambda": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 1
                 },
                 "regmod": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "bending_energy"
                 },
                 "estmov": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 1
                 },
                 "minmet": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0
                 },
                 "splineorder": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 3
                 },
                 "numprec": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "double"
                 },
                 "interp": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "spline"
                 },
                 "scale": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0
                 },
                 "regrid": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 1
                 }
               }
             }
@@ -1809,57 +2012,73 @@
               "type": "object",
               "properties": {
                 "functional_mean_boolean": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "functional_mean_thr": {
                   "type": "object",
                   "properties": {
                     "run": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "threshold_value": {
-                      "type": "number"
+                      "type": "number",
+                      "default": 98
                     }
                   }
                 },
                 "functional_mean_bias_correction": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "frac": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0.3
                 },
                 "mesh_boolean": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "outline": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "padding": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "radius": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0
                 },
                 "reduce_bias": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "remove_eyes": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "robust": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "skull": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "surfaces": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "threshold": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 },
                 "vertical_gradient": {
-                  "type": "number"
+                  "type": "number",
+                  "default": 0.0
                 }
               }
             },
@@ -1868,10 +2087,12 @@
               "properties": {
                 "bold_ref": {},
                 "brain_mask": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask.nii.gz"
                 },
                 "brain_probseg": {
-                  "type": "string"
+                  "type": "string",
+                  "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask.nii.gz"
                 }
               }
             },
@@ -1879,12 +2100,14 @@
               "type": "object",
               "properties": {
                 "anatomical_mask_dilation": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": false
                 }
               }
             },
             "apply_func_mask_in_native_space": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             }
           }
         },
@@ -1892,7 +2115,8 @@
           "type": "object",
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             }
           }
         },
@@ -1900,7 +2124,8 @@
           "type": "object",
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             }
           }
         }
@@ -1919,7 +2144,8 @@
               }
             },
             "denoising_type": {
-              "type": "string"
+              "type": "string",
+              "default": "nonaggr"
             }
           }
         },
@@ -1939,7 +2165,8 @@
               }
             },
             "create_regressors": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             },
             "Regressors": {
               "type": "array",
@@ -2036,10 +2263,12 @@
               }
             },
             "lateral_ventricles_mask": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/atlases/HarvardOxford/HarvardOxford-lateral-ventricles-thr25-2mm.nii.gz"
             },
             "bandpass_filtering_order": {
-              "type": "string"
+              "type": "string",
+              "default": "After"
             },
             "regressor_masks": {
               "type": "object",
@@ -2048,11 +2277,13 @@
                   "type": "object",
                   "properties": {
                     "run": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "brain_mask_erosion_prop": {},
                     "brain_mask_erosion_mm": {
-                      "type": "number"
+                      "type": "number",
+                      "default": 30
                     },
                     "brain_erosion_mm": {}
                   }
@@ -2061,11 +2292,13 @@
                   "type": "object",
                   "properties": {
                     "run": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "csf_erosion_prop": {},
                     "csf_mask_erosion_mm": {
-                      "type": "number"
+                      "type": "number",
+                      "default": 30
                     },
                     "csf_erosion_mm": {}
                   }
@@ -2074,10 +2307,12 @@
                   "type": "object",
                   "properties": {
                     "run": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "wm_erosion_prop": {
-                      "type": "number"
+                      "type": "number",
+                      "default": 0.6
                     },
                     "wm_mask_erosion_mm": {},
                     "wm_erosion_mm": {}
@@ -2087,10 +2322,12 @@
                   "type": "object",
                   "properties": {
                     "run": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "gm_erosion_prop": {
-                      "type": "number"
+                      "type": "number",
+                      "default": 0.6
                     },
                     "gm_mask_erosion_mm": {},
                     "gm_erosion_mm": {}
@@ -2109,7 +2346,8 @@
           "type": "object",
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             },
             "output": {
               "type": "array",
@@ -2135,7 +2373,8 @@
           "type": "object",
           "properties": {
             "run": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             },
             "output": {
               "type": "array",
@@ -2151,7 +2390,8 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "tse_roi_paths": {
           "type": "object",
@@ -2164,7 +2404,8 @@
           "additionalProperties": false
         },
         "realignment": {
-          "type": "string"
+          "type": "string",
+          "default": "ROI_to_func"
         },
         "connectivity_matrix": {
           "type": "object",
@@ -2189,7 +2430,8 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "sca_roi_paths": {
           "type": "object",
@@ -2202,7 +2444,8 @@
           "additionalProperties": false
         },
         "norm_timeseries_for_DR": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         }
       }
     },
@@ -2210,7 +2453,8 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "target_space": {
           "type": "array",
@@ -2236,7 +2480,8 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "target_space": {
           "type": "array",
@@ -2245,7 +2490,8 @@
           }
         },
         "cluster_size": {
-          "type": "number"
+          "type": "number",
+          "default": 27
         }
       }
     },
@@ -2253,34 +2499,43 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "symmetric_registration": {
           "type": "object",
           "properties": {
             "T1w_brain_template_symmetric": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_symmetric.nii.gz"
             },
             "T1w_brain_template_symmetric_funcreg": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_brain_symmetric.nii.gz"
             },
             "T1w_brain_template_symmetric_for_resample": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain_symmetric.nii.gz"
             },
             "T1w_template_symmetric": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_symmetric.nii.gz"
             },
             "T1w_template_symmetric_funcreg": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_symmetric.nii.gz"
             },
             "T1w_template_symmetric_for_resample": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/standard/MNI152_T1_1mm_symmetric.nii.gz"
             },
             "dilated_symmetric_brain_mask": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_symmetric_dil.nii.gz"
             },
             "dilated_symmetric_brain_mask_for_resample": {
-              "type": "string"
+              "type": "string",
+              "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain_mask_symmetric_dil.nii.gz"
             }
           }
         }
@@ -2290,13 +2545,16 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "memory_allocation": {
-          "type": "number"
+          "type": "number",
+          "default": 1.0
         },
         "template_specification_file": {
-          "type": "string"
+          "type": "string",
+          "default": "/cpac_templates/Mask_ABIDE_85Percent_GM.nii.gz"
         },
         "degree_centrality": {
           "type": "object",
@@ -2308,10 +2566,12 @@
               }
             },
             "correlation_threshold_option": {
-              "type": "string"
+              "type": "string",
+              "default": "Sparsity threshold"
             },
             "correlation_threshold": {
-              "type": "number"
+              "type": "number",
+              "default": 0.001
             }
           }
         },
@@ -2325,10 +2585,12 @@
               }
             },
             "correlation_threshold_option": {
-              "type": "string"
+              "type": "string",
+              "default": "Sparsity threshold"
             },
             "correlation_threshold": {
-              "type": "number"
+              "type": "number",
+              "default": 0.001
             }
           }
         },
@@ -2342,10 +2604,12 @@
               }
             },
             "correlation_threshold_option": {
-              "type": "string"
+              "type": "string",
+              "default": "Correlation threshold"
             },
             "correlation_threshold": {
-              "type": "number"
+              "type": "number",
+              "default": 0.6
             }
           }
         }
@@ -2355,7 +2619,8 @@
       "type": "object",
       "properties": {
         "run": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "eye_scan_names": {
           "type": "array",
@@ -2370,22 +2635,27 @@
           }
         },
         "eye_mask_path": {
-          "type": "string"
+          "type": "string",
+          "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_eye_mask.nii.gz"
         },
         "stimulus_path": {
-          "type": "string"
+          "type": "string",
+          "default": "None"
         },
         "minimal_nuisance_correction": {
           "type": "object",
           "properties": {
             "peer_gsr": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             },
             "peer_scrub": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             "scrub_thresh": {
-              "type": "number"
+              "type": "number",
+              "default": 0.2
             }
           }
         }
