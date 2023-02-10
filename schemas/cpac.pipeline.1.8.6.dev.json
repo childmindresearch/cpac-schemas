@@ -1054,9 +1054,11 @@
     },
     "registration_workflows": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "anatomical_registration": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "boolean",
@@ -1064,279 +1066,249 @@
             },
             "resolution_for_anat": {
               "type": "string",
+              "description": "The resolution to which anatomical images should be transformed during registration. This is the resolution at which processed anatomical files will be output.",
               "default": "2mm"
             },
             "T1w_brain_template": {
               "type": "string",
+              "description": "Template to be used during registration. It is not necessary to change this path unless you intend to use a non-standard template.",
               "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain.nii.gz"
             },
             "T1w_template": {
               "type": "string",
+              "description": "Template to be used during registration. It is not necessary to change this path unless you intend to use a non-standard template.",
               "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}.nii.gz"
             },
             "T1w_brain_template_mask": {
               "type": "string",
+              "description": "Template to be used during registration. It is not necessary to change this path unless you intend to use a non-standard template.",
               "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask.nii.gz"
             },
             "reg_with_skull": {
               "type": "boolean",
+              "description": "Register skull-on anatomical image to a template.",
               "default": true
             },
             "registration": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "using": {
                   "type": "array",
+                  "description": "using: ['ANTS', 'FSL', 'FSL-linear']\nthis is a fork point\nselecting both ['ANTS', 'FSL'] will run both and fork the pipeline",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "ANTS",
+                      "FSL",
+                      "FSL-linear"
+                    ]
                   }
                 },
                 "ANTs": {
                   "type": "object",
+                  "description": "option parameters",
+                  "additionalProperties": false,
                   "properties": {
                     "use_lesion_mask": {
                       "type": "boolean",
+                      "description": "If a lesion mask is available for a T1w image, use it to improve the ANTs' registration ANTS registration only.",
                       "default": false
                     },
                     "T1_registration": {
                       "type": "array",
+                      "description": "ANTs parameters for T1-template-based registration",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "collapse-output-transforms": {
-                            "type": "number"
-                          },
-                          "dimensionality": {
-                            "type": "number"
-                          },
-                          "initial-moving-transform": {
+                        "anyOf": [
+                          {
                             "type": "object",
+                            "additionalProperties": false,
                             "properties": {
-                              "initializationFeature": {
+                              "collapse-output-transforms": {
                                 "type": "number"
                               }
                             }
                           },
-                          "transforms": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "Rigid": {
-                                  "type": "object",
-                                  "properties": {
-                                    "gradientStep": {
-                                      "type": "number"
-                                    },
-                                    "metric": {
-                                      "type": "object",
-                                      "properties": {
-                                        "type": {
-                                          "type": "string"
-                                        },
-                                        "metricWeight": {
-                                          "type": "number"
-                                        },
-                                        "numberOfBins": {
-                                          "type": "number"
-                                        },
-                                        "samplingStrategy": {
-                                          "type": "string"
-                                        },
-                                        "samplingPercentage": {
-                                          "type": "number"
-                                        }
-                                      }
-                                    },
-                                    "convergence": {
-                                      "type": "object",
-                                      "properties": {
-                                        "iteration": {
-                                          "type": "string"
-                                        },
-                                        "convergenceThreshold": {
-                                          "type": "number"
-                                        },
-                                        "convergenceWindowSize": {
-                                          "type": "number"
-                                        }
-                                      }
-                                    },
-                                    "smoothing-sigmas": {
-                                      "type": "string"
-                                    },
-                                    "shrink-factors": {
-                                      "type": "string"
-                                    },
-                                    "use-histogram-matching": {
-                                      "type": "boolean"
-                                    }
-                                  }
-                                },
-                                "Affine": {
-                                  "type": "object",
-                                  "properties": {
-                                    "gradientStep": {
-                                      "type": "number"
-                                    },
-                                    "metric": {
-                                      "type": "object",
-                                      "properties": {
-                                        "type": {
-                                          "type": "string"
-                                        },
-                                        "metricWeight": {
-                                          "type": "number"
-                                        },
-                                        "numberOfBins": {
-                                          "type": "number"
-                                        },
-                                        "samplingStrategy": {
-                                          "type": "string"
-                                        },
-                                        "samplingPercentage": {
-                                          "type": "number"
-                                        }
-                                      }
-                                    },
-                                    "convergence": {
-                                      "type": "object",
-                                      "properties": {
-                                        "iteration": {
-                                          "type": "string"
-                                        },
-                                        "convergenceThreshold": {
-                                          "type": "number"
-                                        },
-                                        "convergenceWindowSize": {
-                                          "type": "number"
-                                        }
-                                      }
-                                    },
-                                    "smoothing-sigmas": {
-                                      "type": "string"
-                                    },
-                                    "shrink-factors": {
-                                      "type": "string"
-                                    },
-                                    "use-histogram-matching": {
-                                      "type": "boolean"
-                                    }
-                                  }
-                                },
-                                "SyN": {
-                                  "type": "object",
-                                  "properties": {
-                                    "gradientStep": {
-                                      "type": "number"
-                                    },
-                                    "updateFieldVarianceInVoxelSpace": {
-                                      "type": "number"
-                                    },
-                                    "totalFieldVarianceInVoxelSpace": {
-                                      "type": "number"
-                                    },
-                                    "metric": {
-                                      "type": "object",
-                                      "properties": {
-                                        "type": {
-                                          "type": "string"
-                                        },
-                                        "metricWeight": {
-                                          "type": "number"
-                                        },
-                                        "radius": {
-                                          "type": "number"
-                                        }
-                                      }
-                                    },
-                                    "convergence": {
-                                      "type": "object",
-                                      "properties": {
-                                        "iteration": {
-                                          "type": "string"
-                                        },
-                                        "convergenceThreshold": {
-                                          "type": "number"
-                                        },
-                                        "convergenceWindowSize": {
-                                          "type": "number"
-                                        }
-                                      }
-                                    },
-                                    "smoothing-sigmas": {
-                                      "type": "string"
-                                    },
-                                    "shrink-factors": {
-                                      "type": "string"
-                                    },
-                                    "use-histogram-matching": {
-                                      "type": "boolean"
-                                    },
-                                    "winsorize-image-intensities": {
-                                      "type": "object",
-                                      "properties": {
-                                        "lowerQuantile": {
-                                          "type": "number"
-                                        },
-                                        "upperQuantile": {
-                                          "type": "number"
-                                        }
-                                      }
-                                    }
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "dimensionality": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "initial-moving-transform": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "initializationFeature": {
+                                    "type": "number"
                                   }
                                 }
-                              },
-                              "required": []
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "transforms": {
+                                "type": "array",
+                                "items": {
+                                  "patternProperties": {
+                                    "^(Rigid)|(Affine)|(SyN)$": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "gradientStep": {
+                                          "type": "number"
+                                        },
+                                        "updateFieldVarianceInVoxelSpace": {
+                                          "type": "number"
+                                        },
+                                        "totalFieldVarianceInVoxelSpace": {
+                                          "type": "number"
+                                        },
+                                        "metric": {
+                                          "type": "object",
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "type": {
+                                              "type": "string"
+                                            },
+                                            "metricWeight": {
+                                              "type": "number"
+                                            },
+                                            "radius": {
+                                              "type": "number"
+                                            },
+                                            "numberOfBins": {
+                                              "type": "number"
+                                            },
+                                            "samplingStrategy": {
+                                              "type": "string"
+                                            },
+                                            "samplingPercentage": {
+                                              "type": "number"
+                                            }
+                                          }
+                                        },
+                                        "convergence": {
+                                          "type": "object",
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "iteration": {
+                                              "type": "string"
+                                            },
+                                            "convergenceThreshold": {
+                                              "type": "number"
+                                            },
+                                            "convergenceWindowSize": {
+                                              "type": "number"
+                                            }
+                                          }
+                                        },
+                                        "smoothing-sigmas": {
+                                          "type": "string"
+                                        },
+                                        "shrink-factors": {
+                                          "type": "string"
+                                        },
+                                        "use-histogram-matching": {
+                                          "type": "boolean"
+                                        },
+                                        "winsorize-image-intensities": {
+                                          "type": "object",
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "lowerQuantile": {
+                                              "type": "number"
+                                            },
+                                            "upperQuantile": {
+                                              "type": "number"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                }
+                              }
                             }
                           }
-                        },
-                        "required": []
+                        ]
                       }
                     },
                     "interpolation": {
                       "type": "string",
+                      "description": "Interpolation method for writing out transformed anatomical images.\nPossible values: Linear, BSpline, LanczosWindowedSinc",
+                      "enum": [
+                        "Linear",
+                        "BSpline",
+                        "LanczosWindowedSinc"
+                      ],
                       "default": "LanczosWindowedSinc"
                     }
                   }
                 },
                 "FSL-FNIRT": {
                   "type": "object",
+                  "additionalProperties": false,
                   "properties": {
                     "fnirt_config": {
                       "type": "string",
+                      "description": "Configuration file to be used by FSL to set FNIRT parameters. It is not necessary to change this path unless you intend to use custom FNIRT parameters or a non-standard template.",
                       "default": "T1_2_MNI152_2mm"
                     },
                     "ref_resolution": {
                       "type": "string",
+                      "description": "The resolution to which anatomical images should be transformed during registration.\nThis is the resolution at which processed anatomical files will be output. \nspecifically for monkey pipeline",
                       "default": "2mm"
                     },
                     "ref_mask": {
                       "type": "string",
+                      "description": "Reference mask for FSL registration.",
                       "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_dil.nii.gz"
                     },
                     "FNIRT_T1w_brain_template": {
                       "type": "string",
+                      "description": "Template to be used during registration.\nIt is for monkey pipeline specifically.",
                       "default": "None"
                     },
                     "FNIRT_T1w_template": {
                       "type": "string",
+                      "description": "Template to be used during registration.\nIt is for monkey pipeline specifically.",
                       "default": "None"
                     },
                     "interpolation": {
                       "type": "string",
-                      "default": "sinc"
+                      "description": "Interpolation method for writing out transformed anatomical images.\nPossible values: trilinear, sinc, spline",
+                      "default": "sinc",
+                      "enum": [
+                        "trilinear",
+                        "sinc",
+                        "spline"
+                      ]
                     },
                     "identity_matrix": {
                       "type": "string",
+                      "description": "Identity matrix used during FSL-based resampling of anatomical-space data throughout the pipeline.\nIt is not necessary to change this path unless you intend to use a different template.",
                       "default": "/usr/share/fsl/5.0/etc/flirtsch/ident.mat"
                     },
                     "ref_mask_res-2": {
                       "type": "string",
+                      "description": "Reference mask with 2mm resolution to be used during FNIRT-based brain extraction in ABCD-options pipeline.",
                       "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain_mask_dil.nii.gz"
                     },
                     "T1w_template_res-2": {
                       "type": "string",
+                      "description": "Template with 2mm resolution to be used during FNIRT-based brain extraction in ABCD-options pipeline.",
                       "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm.nii.gz"
                     }
                   }
@@ -1345,6 +1317,7 @@
             },
             "overwrite_transform": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "run": {
                   "type": "boolean",
@@ -1352,7 +1325,11 @@
                 },
                 "using": {
                   "type": "string",
-                  "default": "FSL"
+                  "description": "Choose the tool to overwrite transform, currently only support 'FSL' to overwrite 'ANTs' transforms in ABCD-options pipeline.\nusing: 'FSL'",
+                  "default": "FSL",
+                  "enum": [
+                    "FSL"
+                  ]
                 }
               }
             }
@@ -1360,9 +1337,12 @@
         },
         "functional_registration": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "coregistration": {
               "type": "object",
+              "description": "functional (BOLD/EPI) registration to anatomical (structural/T1)",
+              "additionalProperties": false,
               "properties": {
                 "run": {
                   "type": "boolean",
@@ -1370,30 +1350,49 @@
                 },
                 "reference": {
                   "type": "string",
-                  "default": "brain"
+                  "description": "reference: 'brain' or 'restore-brain'\nIn ABCD-options pipeline, 'restore-brain' is used as coregistration reference",
+                  "default": "brain",
+                  "enum": [
+                    "brain",
+                    "restore-brain"
+                  ]
                 },
                 "using": {
                   "type": "string",
-                  "default": "FSL"
+                  "description": "Choose FSL or ABCD as coregistration method",
+                  "default": "FSL",
+                  "enum": [
+                    "FSL",
+                    "ABCD"
+                  ]
                 },
                 "input": {
                   "type": "string",
-                  "default": "brain"
+                  "description": "Choose brain or whole-head as coregistration input",
+                  "default": "brain",
+                  "enum": [
+                    "brain",
+                    "whole-head"
+                  ]
                 },
                 "interpolation": {
                   "type": "string",
-                  "default": "trilinear"
+                  "default": "trilinear",
+                  "description": "Choose coregistration interpolation"
                 },
                 "cost": {
                   "type": "string",
-                  "default": "corratio"
+                  "default": "corratio",
+                  "description": "Choose coregistration cost function"
                 },
                 "dof": {
-                  "type": "number",
+                  "type": "integer",
+                  "description": "Choose coregistration degree of freedom",
                   "default": 6
                 },
                 "arguments": {
                   "type": "string",
+                  "description": "Extra arguments for FSL flirt",
                   "default": "None"
                 },
                 "func_input_prep": {
@@ -1401,28 +1400,39 @@
                   "properties": {
                     "reg_with_skull": {
                       "type": "boolean",
+                      "description": "Choose whether to use functional brain or skull as the input to functional-to-anatomical registration",
                       "default": false
                     },
                     "input": {
                       "type": "array",
+                      "description": "Choose whether to use the mean of the functional/EPI as the input to functional-to-anatomical registration or one of the volumes from the functional 4D timeseries that you choose.\ninput: ['Mean_Functional', 'Selected_Functional_Volume', 'fmriprep_reference']",
                       "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                          "Mean_Functional",
+                          "Selected_Functional_Volume",
+                          "fmriprep_reference"
+                        ]
                       }
                     },
                     "Mean Functional": {
                       "type": "object",
+                      "additionalProperties": false,
                       "properties": {
                         "n4_correct_func": {
                           "type": "boolean",
+                          "description": "Run ANTs' N4 Bias Field Correction on the input BOLD (EPI)\nthis can increase tissue contrast which may improve registration quality in some data",
                           "default": false
                         }
                       }
                     },
                     "Selected Functional Volume": {
                       "type": "object",
+                      "additionalProperties": false,
                       "properties": {
                         "func_reg_input_volume": {
                           "type": "number",
+                          "description": "Only for when 'Use as Functional-to-Anatomical Registration Input' is set to 'Selected Functional Volume'.\nInput the index of which volume from the functional 4D timeseries input file you wish to use as the input for functional-to-anatomical registration.",
                           "default": 0
                         }
                       }
