@@ -1,0 +1,2274 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "C-PAC pipeline configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "FROM": {
+      "type": "string"
+    },
+    "pipeline_setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pipeline_name": {
+          "type": "string",
+          "description": "Name for this pipeline configuration - useful for identification. This string will be sanitized and used in filepaths."
+        },
+        "output_directory": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Directory where C-PAC should write out processed data, logs, and crash reports.\n - If running in a container (Singularity/Docker), you can simply set this to an arbitrary name like '/outputs', and then map (-B/-v) your desired output directory to that label.\n - If running outside a container, this should be a full path to a directory."
+            },
+            "source_outputs_dir": {
+              "type": "string",
+              "description": "(Optional) Path to a BIDS-Derivatives directory that already has outputs.\n  - This option is intended to ingress already-existing resources from an output directory without writing new outputs back into the same directory.\n  - If provided, C-PAC will ingress the already-computed outputs from this directory and continue the pipeline from where they leave off.\n  - If left as 'None', C-PAC will ingress any already-computed outputs from the output directory you provide above in 'path' instead, the default behavior."
+            },
+            "pull_source_once": {
+              "type": "boolean",
+              "description": "Set to True to make C-PAC ingress the outputs from the primary output directory if they exist, even if a source_outputs_dir is provided\n  - Setting to False will pull from source_outputs_dir every time, over-writing any calculated outputs in the main output directory\n  - C-PAC will still pull from source_outputs_dir if the main output directory is empty, however"
+            },
+            "write_func_outputs": {
+              "type": "boolean",
+              "description": "Include extra versions and intermediate steps of functional preprocessing in the output directory."
+            },
+            "write_debugging_outputs": {
+              "type": "boolean",
+              "description": "Include extra outputs in the output directory that may be of interest when more information is needed."
+            },
+            "output_tree": {
+              "type": "string",
+              "enum": [
+                "default",
+                "ndmg"
+              ],
+              "description": "Output directory format and structure.\nOptions: default, ndmg"
+            },
+            "quality_control": {
+              "type": "object",
+              "description": "Quality control outputs",
+              "additionalProperties": false,
+              "properties": {
+                "generate_quality_control_images": {
+                  "type": "boolean",
+                  "description": "Generate quality control pages containing preprocessing and derivative outputs."
+                },
+                "generate_xcpqc_files": {
+                  "type": "boolean",
+                  "description": "Generate eXtensible Connectivity Pipeline-style quality control files"
+                }
+              }
+            }
+          }
+        },
+        "working_directory": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Directory where C-PAC should store temporary and intermediate files.\n - This directory must be saved if you wish to re-run your pipeline from where you left off (if not completed).\n - NOTE: As it stores all intermediate files, this directory can grow to become very large, especially for data with a large amount of TRs.\n - If running in a container (Singularity/Docker), you can simply set this to an arbitrary name like '/work', and then map (-B/-v) your desired output directory to that label.\n - If running outside a container, this should be a full path to a directory.\n - This can be written to '/tmp' if you do not intend to save your working directory."
+            },
+            "remove_working_dir": {
+              "type": "boolean",
+              "description": "Deletes the contents of the Working Directory after running. This saves disk space, but any additional preprocessing or analysis will have to be completely re-run."
+            }
+          }
+        },
+        "log_directory": {
+          "type": "object",
+          "properties": {
+            "run_logging": {
+              "type": "boolean",
+              "description": "Whether to write log details of the pipeline run to the logging files."
+            },
+            "path": {
+              "type": "string"
+            },
+            "graphviz": {
+              "type": "object",
+              "description": "Configuration options for logging visualizations of the workflow graph",
+              "properties": {
+                "entire_workflow": {
+                  "type": "object",
+                  "description": "Configuration for a graphviz visualization of the entire workflow. See https://fcp-indi.github.io/docs/developer/nodes#CPAC.pipeline.nipype_pipeline_engine.Workflow.write_graph for details about the various options",
+                  "properties": {
+                    "generate": {
+                      "type": "boolean",
+                      "description": "Whether to generate the graph visualization"
+                    },
+                    "graph2use": {
+                      "type": "array",
+                      "description": "Options: [orig, hierarchical, flat, exec, colored]",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "orig",
+                          "hierarchical",
+                          "flat",
+                          "exec",
+                          "colored"
+                        ]
+                      }
+                    },
+                    "format": {
+                      "type": "array",
+                      "description": "Options: [svg, png]",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "svg",
+                          "png"
+                        ]
+                      }
+                    },
+                    "simple_form": {
+                      "type": "boolean",
+                      "description": "The node name will be displayed in the form `nodename (package)` when On or `nodename.Class.package` when Off"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "crash_log_directory": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Directory where CPAC should write crash logs."
+            }
+          }
+        },
+        "system_config": {
+          "type": "object",
+          "properties": {
+            "fail_fast": {
+              "type": "boolean",
+              "description": "Stop worklow execution on first crash?"
+            },
+            "random_seed": {
+              "description": "Random seed used to fix the state of execution.\nIf unset, each process uses its own default.\nIf set, a `random.log` file will be generated logging the random seed and each node to which that seed was applied.\nIf set to a positive integer (up to 2147483647), that integer will be used to seed each process that accepts a random seed.\nIf set to 'random', a random positive integer (up to 2147483647) will be generated and that seed will be used to seed each process that accepts a random seed.",
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "random"
+                  ]
+                }
+              ]
+            },
+            "on_grid": {
+              "type": "object",
+              "description": "Select Off if you intend to run CPAC on a single machine. If set to On, CPAC will attempt to submit jobs through the job scheduler / resource manager selected below.",
+              "additionalProperties": false,
+              "properties": {
+                "run": {
+                  "type": "boolean"
+                },
+                "resource_manager": {
+                  "type": "string",
+                  "description": "Sun Grid Engine (SGE), Portable Batch System (PBS), or Simple Linux Utility for Resource Management (SLURM).\nOnly applies if you are running on a grid or compute cluster.",
+                  "enum": [
+                    "SGE",
+                    "PBS",
+                    "SLURM"
+                  ]
+                },
+                "SGE": {
+                  "type": "object",
+                  "properties": {
+                    "parallel_environment": {
+                      "type": "string",
+                      "description": "SGE Parallel Environment to use when running CPAC.\nOnly applies when you are running on a grid or compute cluster using SGE."
+                    },
+                    "queue": {
+                      "type": "string",
+                      "description": "SGE Queue to use when running CPAC.\nOnly applies when you are running on a grid or compute cluster using SGE."
+                    }
+                  }
+                }
+              }
+            },
+            "maximum_memory_per_participant": {
+              "type": "number",
+              "description": "The maximum amount of memory each participant's workflow can allocate. Use this to place an upper bound of memory usage.\n- Warning: 'Memory Per Participant' multiplied by 'Number of Participants to Run Simultaneously' must not be more than the total amount of RAM.\n- Conversely, using too little RAM can impede the speed of a pipeline run.\n- It is recommended that you set this to a value that when multiplied by 'Number of Participants to Run Simultaneously' is as much RAM you can safely allocate."
+            },
+            "raise_insufficient": {
+              "type": "boolean",
+              "description": "Prior to running a pipeline C-PAC makes a rough estimate of a worst-case-scenario maximum concurrent memory usage with high-resoltion data, raising an exception describing the recommended minimum memory allocation for the given configuration.\nTurning this option off will allow pipelines to run without allocating the recommended minimum, allowing for more efficient runs at the risk of out-of-memory crashes (use at your own risk)"
+            },
+            "observed_usage": {
+              "type": "object",
+              "description": "A callback.log file from a previous run can be provided to estimate memory usage based on that run.",
+              "additionalProperties": false,
+              "properties": {
+                "callback_log": {
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "description": "Path to callback log file with previously observed usage. Can be overridden with the commandline flag `--runtime_usage`."
+                },
+                "buffer": {
+                  "type": "number",
+                  "description": "Percent. E.g., `buffer: 10` would estimate 1.1 * the observed memory usage from the callback log provided in \"usage\". Can be overridden with the commandline flag `--runtime_buffer`."
+                }
+              }
+            },
+            "max_cores_per_participant": {
+              "type": "integer",
+              "description": "The maximum amount of cores (on a single machine) or slots on a node (on a cluster/grid) to allocate per participant.\n- Setting this above 1 will parallelize each participant's workflow where possible. If you wish to dedicate multiple cores to ANTS-based anatomical registration (below), this value must be equal or higher than the amount of cores provided to ANTS.\n- The maximum number of cores your run can possibly employ will be this setting multiplied by the number of participants set to run in parallel (the 'Number of Participants to Run Simultaneously' setting)."
+            },
+            "num_ants_threads": {
+              "type": "integer",
+              "description": "The number of cores to allocate to ANTS-based anatomical registration per participant.\n- Multiple cores can greatly speed up this preprocessing step.\n- This number cannot be greater than the number of cores per participant."
+            },
+            "num_OMP_threads": {
+              "type": "integer",
+              "description": "The number of cores to allocate to processes that use OpenMP."
+            },
+            "num_participants_at_once": {
+              "type": "integer",
+              "description": "The number of participant workflows to run at the same time.\n- The maximum number of cores your run can possibly employ will be this setting multiplied by the number of cores dedicated to each participant (the 'Maximum Number of Cores Per Participant' setting)."
+            },
+            "FSLDIR": {
+              "type": "string",
+              "description": "Full path to the FSL version to be used by CPAC. If you have specified an FSL path in your .bashrc file, this path will be set automatically."
+            }
+          }
+        },
+        "Amazon-AWS": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "aws_output_bucket_credentials": {
+              "type": [
+                "null",
+                "string"
+              ],
+              "description": "If setting the 'Output Directory' to an S3 bucket, insert the path to your AWS credentials file here."
+            },
+            "s3_encryption": {
+              "type": "boolean",
+              "description": "Enable server-side 256-AES encryption on data to the S3 bucket"
+            }
+          }
+        },
+        "Debugging": {
+          "type": "object",
+          "additionalItems": false,
+          "properties": {
+            "verbose": {
+              "type": "boolean",
+              "description": "Verbose developer messages."
+            }
+          }
+        }
+      },
+      "required": [
+        "pipeline_name"
+      ]
+    },
+    "surface_analysis": {
+      "type": "object",
+      "description": "PREPROCESSING",
+      "additionalProperties": false,
+      "properties": {
+        "freesurfer": {
+          "type": "object",
+          "description": "Will run Freesurfer for surface-based analysis. Will output traditional Freesurfer derivatives. If you wish to employ Freesurfer outputs for brain masking or tissue segmentation in the voxel-based pipeline, select those 'Freesurfer-' labeled options further below in anatomical_preproc.",
+          "additionalProperties": false,
+          "properties": {
+            "run_reconall": {
+              "type": "boolean"
+            },
+            "reconall_args": {
+              "type": [
+                "null",
+                "string"
+              ],
+              "description": "Add extra arguments to recon-all command"
+            }
+          }
+        },
+        "post_freesurfer": {
+          "type": "object",
+          "description": "Run ABCD-HCP post FreeSurfer and fMRISurface pipeline",
+          "additionalProperties": false,
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "subcortical_gray_labels": {
+              "type": "string"
+            },
+            "freesurfer_labels": {
+              "type": "string"
+            },
+            "surf_atlas_dir": {
+              "type": "string"
+            },
+            "gray_ordinates_dir": {
+              "type": "string"
+            },
+            "gray_ordinates_res": {
+              "type": "number"
+            },
+            "high_res_mesh": {
+              "type": "number"
+            },
+            "low_res_mesh": {
+              "type": "number"
+            },
+            "fmri_res": {
+              "type": "number"
+            },
+            "smooth_fwhm": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "longitudinal_template_generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "average_method": {
+          "type": "string"
+        },
+        "dof": {
+          "type": "number"
+        },
+        "interp": {
+          "type": "string"
+        },
+        "cost": {
+          "type": "string"
+        },
+        "thread_pool": {
+          "type": "number"
+        },
+        "convergence_threshold": {
+          "type": "number"
+        }
+      }
+    },
+    "anatomical_preproc": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "run_t2": {
+          "type": "boolean"
+        },
+        "non_local_means_filtering": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            },
+            "noise_model": {
+              "type": "string"
+            }
+          }
+        },
+        "n4_bias_field_correction": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            },
+            "shrink_factor": {
+              "type": "number"
+            }
+          }
+        },
+        "t1t2_bias_field_correction": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "BiasFieldSmoothingSigma": {
+              "type": "number"
+            }
+          }
+        },
+        "acpc_alignment": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "run_before_preproc": {
+              "type": "boolean"
+            },
+            "brain_size": {
+              "type": "number"
+            },
+            "FOV_crop": {
+              "type": "string"
+            },
+            "acpc_target": {
+              "type": "string"
+            },
+            "align_brain_mask": {
+              "type": "boolean"
+            },
+            "T1w_ACPC_template": {
+              "type": "string"
+            },
+            "T1w_brain_ACPC_template": {
+              "type": "string"
+            },
+            "T2w_ACPC_template": {
+              "type": "string"
+            },
+            "T2w_brain_ACPC_template": {
+              "type": "string"
+            }
+          }
+        },
+        "brain_extraction": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "using": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "AFNI-3dSkullStrip": {
+              "type": "object",
+              "properties": {
+                "mask_vol": {
+                  "type": "boolean"
+                },
+                "shrink_factor": {
+                  "type": "number"
+                },
+                "var_shrink_fac": {
+                  "type": "boolean"
+                },
+                "shrink_factor_bot_lim": {
+                  "type": "number"
+                },
+                "avoid_vent": {
+                  "type": "boolean"
+                },
+                "n_iterations": {
+                  "type": "number"
+                },
+                "pushout": {
+                  "type": "boolean"
+                },
+                "touchup": {
+                  "type": "boolean"
+                },
+                "fill_hole": {
+                  "type": "number"
+                },
+                "NN_smooth": {
+                  "type": "number"
+                },
+                "smooth_final": {
+                  "type": "number"
+                },
+                "avoid_eyes": {
+                  "type": "boolean"
+                },
+                "use_edge": {
+                  "type": "boolean"
+                },
+                "exp_frac": {
+                  "type": "number"
+                },
+                "push_to_edge": {
+                  "type": "boolean"
+                },
+                "use_skull": {
+                  "type": "boolean"
+                },
+                "perc_int": {
+                  "type": "number"
+                },
+                "max_inter_iter": {
+                  "type": "number"
+                },
+                "fac": {
+                  "type": "number"
+                },
+                "blur_fwhm": {
+                  "type": "number"
+                },
+                "monkey": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "FSL-BET": {
+              "type": "object",
+              "properties": {
+                "frac": {
+                  "type": "number"
+                },
+                "mask_boolean": {
+                  "type": "boolean"
+                },
+                "mesh_boolean": {
+                  "type": "boolean"
+                },
+                "outline": {
+                  "type": "boolean"
+                },
+                "padding": {
+                  "type": "boolean"
+                },
+                "radius": {
+                  "type": "number"
+                },
+                "reduce_bias": {
+                  "type": "boolean"
+                },
+                "remove_eyes": {
+                  "type": "boolean"
+                },
+                "robust": {
+                  "type": "boolean"
+                },
+                "skull": {
+                  "type": "boolean"
+                },
+                "surfaces": {
+                  "type": "boolean"
+                },
+                "threshold": {
+                  "type": "boolean"
+                },
+                "vertical_gradient": {
+                  "type": "number"
+                }
+              }
+            },
+            "UNet": {
+              "type": "object",
+              "properties": {
+                "unet_model": {
+                  "type": "string"
+                }
+              }
+            },
+            "niworkflows-ants": {
+              "type": "object",
+              "properties": {
+                "template_path": {
+                  "type": "string"
+                },
+                "mask_path": {
+                  "type": "string"
+                },
+                "regmask_path": {
+                  "type": "string"
+                }
+              }
+            },
+            "FreeSurfer-BET": {
+              "type": "object",
+              "properties": {
+                "T1w_brain_template_mask_ccs": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "segmentation": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "tissue_segmentation": {
+          "type": "object",
+          "properties": {
+            "using": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "FSL-FAST": {
+              "type": "object",
+              "properties": {
+                "thresholding": {
+                  "type": "object",
+                  "properties": {
+                    "use": {
+                      "type": "string"
+                    },
+                    "Custom": {
+                      "type": "object",
+                      "properties": {
+                        "CSF_threshold_value": {
+                          "type": "number"
+                        },
+                        "WM_threshold_value": {
+                          "type": "number"
+                        },
+                        "GM_threshold_value": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                },
+                "use_priors": {
+                  "type": "object",
+                  "properties": {
+                    "run": {
+                      "type": "boolean"
+                    },
+                    "priors_path": {
+                      "type": "string"
+                    },
+                    "WM_path": {
+                      "type": "string"
+                    },
+                    "GM_path": {
+                      "type": "string"
+                    },
+                    "CSF_path": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "Template_Based": {
+              "type": "object",
+              "properties": {
+                "template_for_segmentation": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "WHITE": {
+                  "type": "string"
+                },
+                "GRAY": {
+                  "type": "string"
+                },
+                "CSF": {
+                  "type": "string"
+                }
+              }
+            },
+            "ANTs_Prior_Based": {
+              "type": "object",
+              "properties": {
+                "template_brain_list": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "template_segmentation_list": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "CSF_label": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "GM_label": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "WM_label": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            "FreeSurfer": {
+              "type": "object",
+              "properties": {
+                "erode": {
+                  "type": "number"
+                },
+                "CSF_label": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "GM_label": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "WM_label": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "registration_workflows": {
+      "type": "object",
+      "properties": {
+        "anatomical_registration": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "resolution_for_anat": {
+              "type": "string"
+            },
+            "T1w_brain_template": {
+              "type": "string"
+            },
+            "T1w_template": {
+              "type": "string"
+            },
+            "T1w_brain_template_mask": {
+              "type": "string"
+            },
+            "reg_with_skull": {
+              "type": "boolean"
+            },
+            "registration": {
+              "type": "object",
+              "properties": {
+                "using": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "ANTs": {
+                  "type": "object",
+                  "properties": {
+                    "use_lesion_mask": {
+                      "type": "boolean"
+                    },
+                    "T1_registration": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "collapse-output-transforms": {
+                            "type": "number"
+                          },
+                          "dimensionality": {
+                            "type": "number"
+                          },
+                          "initial-moving-transform": {
+                            "type": "object",
+                            "properties": {
+                              "initializationFeature": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "transforms": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "Rigid": {
+                                  "type": "object",
+                                  "properties": {
+                                    "gradientStep": {
+                                      "type": "number"
+                                    },
+                                    "metric": {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "metricWeight": {
+                                          "type": "number"
+                                        },
+                                        "numberOfBins": {
+                                          "type": "number"
+                                        },
+                                        "samplingStrategy": {
+                                          "type": "string"
+                                        },
+                                        "samplingPercentage": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "convergence": {
+                                      "type": "object",
+                                      "properties": {
+                                        "iteration": {
+                                          "type": "string"
+                                        },
+                                        "convergenceThreshold": {
+                                          "type": "number"
+                                        },
+                                        "convergenceWindowSize": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "smoothing-sigmas": {
+                                      "type": "string"
+                                    },
+                                    "shrink-factors": {
+                                      "type": "string"
+                                    },
+                                    "use-histogram-matching": {
+                                      "type": "boolean"
+                                    }
+                                  }
+                                },
+                                "Affine": {
+                                  "type": "object",
+                                  "properties": {
+                                    "gradientStep": {
+                                      "type": "number"
+                                    },
+                                    "metric": {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "metricWeight": {
+                                          "type": "number"
+                                        },
+                                        "numberOfBins": {
+                                          "type": "number"
+                                        },
+                                        "samplingStrategy": {
+                                          "type": "string"
+                                        },
+                                        "samplingPercentage": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "convergence": {
+                                      "type": "object",
+                                      "properties": {
+                                        "iteration": {
+                                          "type": "string"
+                                        },
+                                        "convergenceThreshold": {
+                                          "type": "number"
+                                        },
+                                        "convergenceWindowSize": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "smoothing-sigmas": {
+                                      "type": "string"
+                                    },
+                                    "shrink-factors": {
+                                      "type": "string"
+                                    },
+                                    "use-histogram-matching": {
+                                      "type": "boolean"
+                                    }
+                                  }
+                                },
+                                "SyN": {
+                                  "type": "object",
+                                  "properties": {
+                                    "gradientStep": {
+                                      "type": "number"
+                                    },
+                                    "updateFieldVarianceInVoxelSpace": {
+                                      "type": "number"
+                                    },
+                                    "totalFieldVarianceInVoxelSpace": {
+                                      "type": "number"
+                                    },
+                                    "metric": {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "metricWeight": {
+                                          "type": "number"
+                                        },
+                                        "radius": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "convergence": {
+                                      "type": "object",
+                                      "properties": {
+                                        "iteration": {
+                                          "type": "string"
+                                        },
+                                        "convergenceThreshold": {
+                                          "type": "number"
+                                        },
+                                        "convergenceWindowSize": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "smoothing-sigmas": {
+                                      "type": "string"
+                                    },
+                                    "shrink-factors": {
+                                      "type": "string"
+                                    },
+                                    "use-histogram-matching": {
+                                      "type": "boolean"
+                                    },
+                                    "winsorize-image-intensities": {
+                                      "type": "object",
+                                      "properties": {
+                                        "lowerQuantile": {
+                                          "type": "number"
+                                        },
+                                        "upperQuantile": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "required": []
+                            }
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "interpolation": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "FSL-FNIRT": {
+                  "type": "object",
+                  "properties": {
+                    "fnirt_config": {
+                      "type": "string"
+                    },
+                    "ref_resolution": {
+                      "type": "string"
+                    },
+                    "ref_mask": {
+                      "type": "string"
+                    },
+                    "FNIRT_T1w_brain_template": {
+                      "type": "string"
+                    },
+                    "FNIRT_T1w_template": {
+                      "type": "string"
+                    },
+                    "interpolation": {
+                      "type": "string"
+                    },
+                    "identity_matrix": {
+                      "type": "string"
+                    },
+                    "ref_mask_res-2": {
+                      "type": "string"
+                    },
+                    "T1w_template_res-2": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "overwrite_transform": {
+              "type": "object",
+              "properties": {
+                "run": {
+                  "type": "boolean"
+                },
+                "using": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "functional_registration": {
+          "type": "object",
+          "properties": {
+            "coregistration": {
+              "type": "object",
+              "properties": {
+                "run": {
+                  "type": "boolean"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "using": {
+                  "type": "string"
+                },
+                "input": {
+                  "type": "string"
+                },
+                "interpolation": {
+                  "type": "string"
+                },
+                "cost": {
+                  "type": "string"
+                },
+                "dof": {
+                  "type": "number"
+                },
+                "arguments": {
+                  "type": "string"
+                },
+                "func_input_prep": {
+                  "type": "object",
+                  "properties": {
+                    "reg_with_skull": {
+                      "type": "boolean"
+                    },
+                    "input": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "Mean Functional": {
+                      "type": "object",
+                      "properties": {
+                        "n4_correct_func": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "Selected Functional Volume": {
+                      "type": "object",
+                      "properties": {
+                        "func_reg_input_volume": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                },
+                "boundary_based_registration": {
+                  "type": "object",
+                  "properties": {
+                    "run": {
+                      "type": "array",
+                      "items": {
+                        "type": "boolean"
+                      }
+                    },
+                    "bbr_schedule": {
+                      "type": "string"
+                    },
+                    "reference": {
+                      "type": "string"
+                    },
+                    "bbr_wm_map": {
+                      "type": "string"
+                    },
+                    "bbr_wm_mask_args": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "EPI_registration": {
+              "type": "object",
+              "properties": {
+                "run": {
+                  "type": "boolean"
+                },
+                "using": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "EPI_template": {
+                  "type": "string"
+                },
+                "EPI_template_mask": {
+                  "type": "string"
+                },
+                "ANTs": {
+                  "type": "object",
+                  "properties": {
+                    "parameters": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "collapse-output-transforms": {
+                            "type": "number"
+                          },
+                          "dimensionality": {
+                            "type": "number"
+                          },
+                          "initial-moving-transform": {
+                            "type": "object",
+                            "properties": {
+                              "initializationFeature": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "transforms": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "Rigid": {
+                                  "type": "object",
+                                  "properties": {
+                                    "gradientStep": {
+                                      "type": "number"
+                                    },
+                                    "metric": {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "metricWeight": {
+                                          "type": "number"
+                                        },
+                                        "numberOfBins": {
+                                          "type": "number"
+                                        },
+                                        "samplingStrategy": {
+                                          "type": "string"
+                                        },
+                                        "samplingPercentage": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "convergence": {
+                                      "type": "object",
+                                      "properties": {
+                                        "iteration": {
+                                          "type": "string"
+                                        },
+                                        "convergenceThreshold": {
+                                          "type": "number"
+                                        },
+                                        "convergenceWindowSize": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "smoothing-sigmas": {
+                                      "type": "string"
+                                    },
+                                    "shrink-factors": {
+                                      "type": "string"
+                                    },
+                                    "use-histogram-matching": {
+                                      "type": "boolean"
+                                    }
+                                  }
+                                },
+                                "Affine": {
+                                  "type": "object",
+                                  "properties": {
+                                    "gradientStep": {
+                                      "type": "number"
+                                    },
+                                    "metric": {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "metricWeight": {
+                                          "type": "number"
+                                        },
+                                        "numberOfBins": {
+                                          "type": "number"
+                                        },
+                                        "samplingStrategy": {
+                                          "type": "string"
+                                        },
+                                        "samplingPercentage": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "convergence": {
+                                      "type": "object",
+                                      "properties": {
+                                        "iteration": {
+                                          "type": "string"
+                                        },
+                                        "convergenceThreshold": {
+                                          "type": "number"
+                                        },
+                                        "convergenceWindowSize": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "smoothing-sigmas": {
+                                      "type": "string"
+                                    },
+                                    "shrink-factors": {
+                                      "type": "string"
+                                    },
+                                    "use-histogram-matching": {
+                                      "type": "boolean"
+                                    }
+                                  }
+                                },
+                                "SyN": {
+                                  "type": "object",
+                                  "properties": {
+                                    "gradientStep": {
+                                      "type": "number"
+                                    },
+                                    "updateFieldVarianceInVoxelSpace": {
+                                      "type": "number"
+                                    },
+                                    "totalFieldVarianceInVoxelSpace": {
+                                      "type": "number"
+                                    },
+                                    "metric": {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "metricWeight": {
+                                          "type": "number"
+                                        },
+                                        "radius": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "convergence": {
+                                      "type": "object",
+                                      "properties": {
+                                        "iteration": {
+                                          "type": "string"
+                                        },
+                                        "convergenceThreshold": {
+                                          "type": "number"
+                                        },
+                                        "convergenceWindowSize": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "smoothing-sigmas": {
+                                      "type": "string"
+                                    },
+                                    "shrink-factors": {
+                                      "type": "string"
+                                    },
+                                    "use-histogram-matching": {
+                                      "type": "boolean"
+                                    },
+                                    "winsorize-image-intensities": {
+                                      "type": "object",
+                                      "properties": {
+                                        "lowerQuantile": {
+                                          "type": "number"
+                                        },
+                                        "upperQuantile": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "required": []
+                            }
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "interpolation": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "FSL-FNIRT": {
+                  "type": "object",
+                  "properties": {
+                    "fnirt_config": {
+                      "type": "string"
+                    },
+                    "interpolation": {
+                      "type": "string"
+                    },
+                    "identity_matrix": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "func_registration_to_template": {
+              "type": "object",
+              "properties": {
+                "run": {
+                  "type": "boolean"
+                },
+                "run_EPI": {
+                  "type": "boolean"
+                },
+                "output_resolution": {
+                  "type": "object",
+                  "properties": {
+                    "func_preproc_outputs": {
+                      "type": "string"
+                    },
+                    "func_derivative_outputs": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "target_template": {
+                  "type": "object",
+                  "properties": {
+                    "using": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "T1_template": {
+                      "type": "object",
+                      "properties": {
+                        "T1w_brain_template_funcreg": {
+                          "type": "string"
+                        },
+                        "T1w_template_funcreg": {
+                          "type": "string"
+                        },
+                        "T1w_brain_template_mask_funcreg": {
+                          "type": "string"
+                        },
+                        "T1w_template_for_resample": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "EPI_template": {
+                      "type": "object",
+                      "properties": {
+                        "EPI_template_funcreg": {
+                          "type": "string"
+                        },
+                        "EPI_template_mask_funcreg": {
+                          "type": "string"
+                        },
+                        "EPI_template_for_resample": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "ANTs_pipelines": {
+                  "type": "object",
+                  "properties": {
+                    "interpolation": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "FNIRT_pipelines": {
+                  "type": "object",
+                  "properties": {
+                    "interpolation": {
+                      "type": "string"
+                    },
+                    "identity_matrix": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "apply_transform": {
+                  "type": "object",
+                  "properties": {
+                    "using": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "functional_preproc": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "truncation": {
+          "type": "object",
+          "properties": {
+            "start_tr": {
+              "type": "number"
+            },
+            "stop_tr": {
+              "type": "string"
+            }
+          }
+        },
+        "scaling": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "scaling_factor": {
+              "type": "number"
+            }
+          }
+        },
+        "despiking": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "slice_timing_correction": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            },
+            "tpattern": {
+              "type": "string"
+            },
+            "tzero": {
+              "type": "string"
+            }
+          }
+        },
+        "motion_estimates_and_correction": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "motion_estimates": {
+              "type": "object",
+              "properties": {
+                "calculate_motion_first": {
+                  "type": "boolean"
+                },
+                "calculate_motion_after": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "motion_correction": {
+              "type": "object",
+              "properties": {
+                "using": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "AFNI-3dvolreg": {
+                  "type": "object",
+                  "properties": {
+                    "functional_volreg_twopass": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "motion_correction_reference": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "motion_correction_reference_volume": {
+                  "type": "number"
+                }
+              }
+            },
+            "motion_estimate_filter": {
+              "type": "object",
+              "properties": {
+                "run": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean"
+                  }
+                },
+                "filters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "filter_type": {
+                        "type": "string"
+                      },
+                      "filter_order": {
+                        "type": "number"
+                      },
+                      "breathing_rate_min": {},
+                      "breathing_rate_max": {},
+                      "center_frequency": {},
+                      "filter_bandwidth": {},
+                      "lowpass_cutoff": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "distortion_correction": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            },
+            "using": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "PhaseDiff": {
+              "type": "object",
+              "properties": {
+                "fmap_skullstrip_option": {
+                  "type": "string"
+                },
+                "fmap_skullstrip_BET_frac": {
+                  "type": "number"
+                },
+                "fmap_skullstrip_AFNI_threshold": {
+                  "type": "number"
+                }
+              }
+            },
+            "Blip-FSL-TOPUP": {
+              "type": "object",
+              "properties": {
+                "warpres": {
+                  "type": "number"
+                },
+                "subsamp": {
+                  "type": "number"
+                },
+                "fwhm": {
+                  "type": "number"
+                },
+                "miter": {
+                  "type": "number"
+                },
+                "lambda": {
+                  "type": "number"
+                },
+                "ssqlambda": {
+                  "type": "number"
+                },
+                "regmod": {
+                  "type": "string"
+                },
+                "estmov": {
+                  "type": "number"
+                },
+                "minmet": {
+                  "type": "number"
+                },
+                "splineorder": {
+                  "type": "number"
+                },
+                "numprec": {
+                  "type": "string"
+                },
+                "interp": {
+                  "type": "string"
+                },
+                "scale": {
+                  "type": "number"
+                },
+                "regrid": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "func_masking": {
+          "type": "object",
+          "properties": {
+            "using": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "FSL-BET": {
+              "type": "object",
+              "properties": {
+                "functional_mean_boolean": {
+                  "type": "boolean"
+                },
+                "functional_mean_thr": {
+                  "type": "object",
+                  "properties": {
+                    "run": {
+                      "type": "boolean"
+                    },
+                    "threshold_value": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "functional_mean_bias_correction": {
+                  "type": "boolean"
+                },
+                "frac": {
+                  "type": "number"
+                },
+                "mesh_boolean": {
+                  "type": "boolean"
+                },
+                "outline": {
+                  "type": "boolean"
+                },
+                "padding": {
+                  "type": "boolean"
+                },
+                "radius": {
+                  "type": "number"
+                },
+                "reduce_bias": {
+                  "type": "boolean"
+                },
+                "remove_eyes": {
+                  "type": "boolean"
+                },
+                "robust": {
+                  "type": "boolean"
+                },
+                "skull": {
+                  "type": "boolean"
+                },
+                "surfaces": {
+                  "type": "boolean"
+                },
+                "threshold": {
+                  "type": "boolean"
+                },
+                "vertical_gradient": {
+                  "type": "number"
+                }
+              }
+            },
+            "FSL_AFNI": {
+              "type": "object",
+              "properties": {
+                "bold_ref": {},
+                "brain_mask": {
+                  "type": "string"
+                },
+                "brain_probseg": {
+                  "type": "string"
+                }
+              }
+            },
+            "Anatomical_Refined": {
+              "type": "object",
+              "properties": {
+                "anatomical_mask_dilation": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "apply_func_mask_in_native_space": {
+              "type": "boolean"
+            }
+          }
+        },
+        "generate_func_mean": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            }
+          }
+        },
+        "normalize_func": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "nuisance_corrections": {
+      "type": "object",
+      "properties": {
+        "1-ICA-AROMA": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            },
+            "denoising_type": {
+              "type": "string"
+            }
+          }
+        },
+        "2-nuisance_regression": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            },
+            "space": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "create_regressors": {
+              "type": "boolean"
+            },
+            "Regressors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string"
+                  },
+                  "Motion": {
+                    "type": "object",
+                    "properties": {
+                      "include_delayed": {
+                        "type": "boolean"
+                      },
+                      "include_squared": {
+                        "type": "boolean"
+                      },
+                      "include_delayed_squared": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "aCompCor": {
+                    "type": "object",
+                    "properties": {
+                      "summary": {
+                        "type": "object",
+                        "properties": {
+                          "method": {
+                            "type": "string"
+                          },
+                          "components": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "tissues": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "extraction_resolution": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "CerebrospinalFluid": {
+                    "type": "object",
+                    "properties": {
+                      "summary": {
+                        "type": "string"
+                      },
+                      "extraction_resolution": {
+                        "type": "number"
+                      },
+                      "erode_mask": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "GlobalSignal": {
+                    "type": "object",
+                    "properties": {
+                      "summary": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "PolyOrt": {
+                    "type": "object",
+                    "properties": {
+                      "degree": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "Bandpass": {
+                    "type": "object",
+                    "properties": {
+                      "bottom_frequency": {
+                        "type": "number"
+                      },
+                      "top_frequency": {
+                        "type": "number"
+                      },
+                      "method": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "lateral_ventricles_mask": {
+              "type": "string"
+            },
+            "bandpass_filtering_order": {
+              "type": "string"
+            },
+            "regressor_masks": {
+              "type": "object",
+              "properties": {
+                "erode_anatomical_brain_mask": {
+                  "type": "object",
+                  "properties": {
+                    "run": {
+                      "type": "boolean"
+                    },
+                    "brain_mask_erosion_prop": {},
+                    "brain_mask_erosion_mm": {
+                      "type": "number"
+                    },
+                    "brain_erosion_mm": {}
+                  }
+                },
+                "erode_csf": {
+                  "type": "object",
+                  "properties": {
+                    "run": {
+                      "type": "boolean"
+                    },
+                    "csf_erosion_prop": {},
+                    "csf_mask_erosion_mm": {
+                      "type": "number"
+                    },
+                    "csf_erosion_mm": {}
+                  }
+                },
+                "erode_wm": {
+                  "type": "object",
+                  "properties": {
+                    "run": {
+                      "type": "boolean"
+                    },
+                    "wm_erosion_prop": {
+                      "type": "number"
+                    },
+                    "wm_mask_erosion_mm": {},
+                    "wm_erosion_mm": {}
+                  }
+                },
+                "erode_gm": {
+                  "type": "object",
+                  "properties": {
+                    "run": {
+                      "type": "boolean"
+                    },
+                    "gm_erosion_prop": {
+                      "type": "number"
+                    },
+                    "gm_mask_erosion_mm": {},
+                    "gm_erosion_mm": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "post_processing": {
+      "type": "object",
+      "properties": {
+        "spatial_smoothing": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "output": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "smoothing_method": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "fwhm": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "z-scoring": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "boolean"
+            },
+            "output": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "timeseries_extraction": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "tse_roi_paths": {
+          "type": "object",
+          "patternProperties": {
+            "^.*$": {
+              "type": "string",
+              "pattern": "^((Avg)|(Voxel)|(SpatialReg))(, ((Avg)|(Voxel)|(SpatialReg)))*$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "realignment": {
+          "type": "string"
+        },
+        "connectivity_matrix": {
+          "type": "object",
+          "properties": {
+            "using": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "measure": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "seed_based_correlation_analysis": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "sca_roi_paths": {
+          "type": "object",
+          "patternProperties": {
+            "^.*$": {
+              "type": "string",
+              "pattern": "^((Avg)|(DualReg)|(MultReg))(, ((Avg)|(DualReg)|(MultReg)))*$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "norm_timeseries_for_DR": {
+          "type": "boolean"
+        }
+      }
+    },
+    "amplitude_low_frequency_fluctuation": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "target_space": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "highpass_cutoff": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "lowpass_cutoff": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "regional_homogeneity": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "target_space": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cluster_size": {
+          "type": "number"
+        }
+      }
+    },
+    "voxel_mirrored_homotopic_connectivity": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "symmetric_registration": {
+          "type": "object",
+          "properties": {
+            "T1w_brain_template_symmetric": {
+              "type": "string"
+            },
+            "T1w_brain_template_symmetric_funcreg": {
+              "type": "string"
+            },
+            "T1w_brain_template_symmetric_for_resample": {
+              "type": "string"
+            },
+            "T1w_template_symmetric": {
+              "type": "string"
+            },
+            "T1w_template_symmetric_funcreg": {
+              "type": "string"
+            },
+            "T1w_template_symmetric_for_resample": {
+              "type": "string"
+            },
+            "dilated_symmetric_brain_mask": {
+              "type": "string"
+            },
+            "dilated_symmetric_brain_mask_for_resample": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "network_centrality": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "memory_allocation": {
+          "type": "number"
+        },
+        "template_specification_file": {
+          "type": "string"
+        },
+        "degree_centrality": {
+          "type": "object",
+          "properties": {
+            "weight_options": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "correlation_threshold_option": {
+              "type": "string"
+            },
+            "correlation_threshold": {
+              "type": "number"
+            }
+          }
+        },
+        "eigenvector_centrality": {
+          "type": "object",
+          "properties": {
+            "weight_options": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "correlation_threshold_option": {
+              "type": "string"
+            },
+            "correlation_threshold": {
+              "type": "number"
+            }
+          }
+        },
+        "local_functional_connectivity_density": {
+          "type": "object",
+          "properties": {
+            "weight_options": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "correlation_threshold_option": {
+              "type": "string"
+            },
+            "correlation_threshold": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "PyPEER": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "type": "boolean"
+        },
+        "eye_scan_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_scan_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "eye_mask_path": {
+          "type": "string"
+        },
+        "stimulus_path": {
+          "type": "string"
+        },
+        "minimal_nuisance_correction": {
+          "type": "object",
+          "properties": {
+            "peer_gsr": {
+              "type": "boolean"
+            },
+            "peer_scrub": {
+              "type": "boolean"
+            },
+            "scrub_thresh": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "pipeline_setup"
+  ]
+}
