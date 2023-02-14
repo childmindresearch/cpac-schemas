@@ -26,7 +26,10 @@
               "default": "/outputs/output"
             },
             "source_outputs_dir": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "(Optional) Path to a BIDS-Derivatives directory that already has outputs.\n  - This option is intended to ingress already-existing resources from an output directory without writing new outputs back into the same directory.\n  - If provided, C-PAC will ingress the already-computed outputs from this directory and continue the pipeline from where they leave off.\n  - If left as 'None', C-PAC will ingress any already-computed outputs from the output directory you provide above in 'path' instead, the default behavior.",
               "default": "None"
             },
@@ -581,22 +584,34 @@
               "default": false
             },
             "T1w_ACPC_template": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "ACPC aligned template",
               "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_1mm.nii.gz"
             },
             "T1w_brain_ACPC_template": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "ACPC aligned template",
               "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_1mm_brain.nii.gz"
             },
             "T2w_ACPC_template": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "ACPC aligned template",
               "default": "None"
             },
             "T2w_brain_ACPC_template": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "ACPC aligned template",
               "default": "None"
             }
@@ -848,7 +863,10 @@
               "additionalProperties": false,
               "properties": {
                 "T1w_brain_template_mask_ccs": {
-                  "type": "string",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
                   "description": "Template to be used for FreeSurfer-BET brain extraction in CCS-options pipeline",
                   "default": "/ccs_template/MNI152_T1_1mm_first_brain_mask.nii.gz"
                 }
@@ -936,7 +954,10 @@
                       "default": true
                     },
                     "priors_path": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "description": "Full path to a directory containing binarized prior probability maps.\nThese maps are included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use non-standard priors.",
                       "default": "$FSLDIR/data/standard/tissuepriors/2mm"
                     },
@@ -975,17 +996,26 @@
                   }
                 },
                 "WHITE": {
-                  "type": "string",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
                   "description": "These masks are included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nFull path to a binarized White Matter mask.",
                   "default": "$FSLDIR/data/standard/tissuepriors/2mm/avg152T1_white_bin.nii.gz"
                 },
                 "GRAY": {
-                  "type": "string",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
                   "description": "These masks are included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nFull path to a binarized Gray Matter mask.",
                   "default": "$FSLDIR/data/standard/tissuepriors/2mm/avg152T1_gray_bin.nii.gz"
                 },
                 "CSF": {
-                  "type": "string",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
                   "description": "These masks are included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nFull path to a binarized CSF mask.",
                   "default": "$FSLDIR/data/standard/tissuepriors/2mm/avg152T1_csf_bin.nii.gz"
                 }
@@ -997,14 +1027,20 @@
               "description": "Generate white matter, gray matter, CSF masks based on antsJointLabelFusion ANTs Prior-based Segmentation workflow that has shown optimal results for non-human primate data.",
               "properties": {
                 "template_brain_list": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "description": "The atlas image assumed to be used in ANTs Prior-based Segmentation.",
                   "items": {
                     "type": "string"
                   }
                 },
                 "template_segmentation_list": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "description": "The atlas segmentation images.\nFor performing ANTs Prior-based segmentation method\nthe number of specified segmentations should be identical to the number of atlas brain image sets.\neg.\nANTs_prior_seg_template_brain_list :\n  - atlas1.nii.gz\n  - atlas2.nii.gz\nANTs_prior_seg_template_segmentation_list:\n  - segmentation1.nii.gz\n  - segmentation1.nii.gz",
                   "items": {
                     "type": "string"
@@ -1042,7 +1078,10 @@
               "additionalProperties": false,
               "properties": {
                 "erode": {
-                  "type": "number",
+                  "type": [
+                    "null",
+                    "number"
+                  ],
                   "description": "Use mri_binarize --erode option to erode segmentation masks",
                   "default": 0
                 },
@@ -1137,7 +1176,10 @@
                       "default": false
                     },
                     "T1_registration": {
-                      "type": "array",
+                      "type": [
+                        "null",
+                        "array"
+                      ],
                       "description": "ANTs parameters for T1-template-based registration",
                       "items": {
                         "anyOf": [
@@ -1156,6 +1198,42 @@
                             "properties": {
                               "dimensionality": {
                                 "type": "integer"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "verbose": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "float": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "winsorize-image-intensities": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "lowerQuantile": {
+                                    "type": "number"
+                                  },
+                                  "upperQuantile": {
+                                    "type": "number"
+                                  }
+                                }
                               }
                             }
                           },
@@ -1237,6 +1315,9 @@
                                         "smoothing-sigmas": {
                                           "type": "string"
                                         },
+                                        "masks": {
+                                          "type": "boolean"
+                                        },
                                         "shrink-factors": {
                                           "type": "string"
                                         },
@@ -1293,17 +1374,26 @@
                       "default": "2mm"
                     },
                     "ref_mask": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "description": "Reference mask for FSL registration.",
                       "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_dil.nii.gz"
                     },
                     "FNIRT_T1w_brain_template": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "description": "Template to be used during registration.\nIt is for monkey pipeline specifically.",
                       "default": "None"
                     },
                     "FNIRT_T1w_template": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "description": "Template to be used during registration.\nIt is for monkey pipeline specifically.",
                       "default": "None"
                     },
@@ -1318,17 +1408,26 @@
                       ]
                     },
                     "identity_matrix": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "description": "Identity matrix used during FSL-based resampling of anatomical-space data throughout the pipeline.\nIt is not necessary to change this path unless you intend to use a different template.",
                       "default": "/usr/share/fsl/5.0/etc/flirtsch/ident.mat"
                     },
                     "ref_mask_res-2": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "description": "Reference mask with 2mm resolution to be used during FNIRT-based brain extraction in ABCD-options pipeline.",
                       "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain_mask_dil.nii.gz"
                     },
                     "T1w_template_res-2": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "description": "Template with 2mm resolution to be used during FNIRT-based brain extraction in ABCD-options pipeline.",
                       "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm.nii.gz"
                     }
@@ -1412,7 +1511,10 @@
                   "default": 6
                 },
                 "arguments": {
-                  "type": "string",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
                   "description": "Extra arguments for FSL flirt",
                   "default": "None"
                 },
@@ -1526,7 +1628,10 @@
                   "default": "s3://fcp-indi/resources/cpac/resources/epi_hbn.nii.gz"
                 },
                 "EPI_template_mask": {
-                  "type": "string",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
                   "description": "EPI template mask.",
                   "default": "None"
                 },
@@ -1535,7 +1640,10 @@
                   "additionalProperties": false,
                   "properties": {
                     "parameters": {
-                      "type": "array",
+                      "type": [
+                        "null",
+                        "array"
+                      ],
                       "description": "EPI registration configuration - synonymous with T1_registration parameters under anatomical registration above",
                       "items": {
                         "anyOf": [
@@ -1755,22 +1863,34 @@
                       "additionalProperties": false,
                       "properties": {
                         "T1w_brain_template_funcreg": {
-                          "type": "string",
+                          "type": [
+                            "null",
+                            "string"
+                          ],
                           "description": "Standard Skull Stripped Template. Used as a reference image for functional registration.\nThis can be different than the template used as the reference/fixed for T1-to-template registration.",
                           "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${func_resolution}_brain.nii.gz"
                         },
                         "T1w_template_funcreg": {
-                          "type": "string",
+                          "type": [
+                            "null",
+                            "string"
+                          ],
                           "description": "Standard Anatomical Brain Image with Skull.\nThis can be different than the template used as the reference/fixed for T1-to-template registration.",
                           "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${func_resolution}.nii.gz"
                         },
                         "T1w_brain_template_mask_funcreg": {
-                          "type": "string",
+                          "type": [
+                            "null",
+                            "string"
+                          ],
                           "description": "Template to be used during registration.\nIt is not necessary to change this path unless you intend to use a non-standard template.",
                           "default": "/usr/share/fsl/5.0/data/standard/MNI152_T1_${func_resolution}_brain_mask.nii.gz"
                         },
                         "T1w_template_for_resample": {
-                          "type": "string",
+                          "type": [
+                            "null",
+                            "string"
+                          ],
                           "description": "a standard template for resampling if using float resolution",
                           "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz"
                         }
@@ -1781,17 +1901,26 @@
                       "additionalProperties": false,
                       "properties": {
                         "EPI_template_funcreg": {
-                          "type": "string",
+                          "type": [
+                            "null",
+                            "string"
+                          ],
                           "description": "EPI template for direct functional-to-template registration (bypassing coregistration and the anatomical-to-template transforms)",
                           "default": "s3://fcp-indi/resources/cpac/resources/epi_hbn.nii.gz"
                         },
                         "EPI_template_mask_funcreg": {
-                          "type": "string",
+                          "type": [
+                            "null",
+                            "string"
+                          ],
                           "description": "EPI template mask.",
                           "default": "None"
                         },
                         "EPI_template_for_resample": {
-                          "type": "string",
+                          "type": [
+                            "null",
+                            "string"
+                          ],
                           "description": "a standard template for resampling if using float resolution",
                           "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz"
                         }
@@ -1879,6 +2008,7 @@
             },
             "stop_tr": {
               "type": [
+                "null",
                 "number",
                 "string"
               ],
@@ -1913,6 +2043,9 @@
               "items": {
                 "type": "boolean"
               }
+            },
+            "space": {
+              "type": "string"
             }
           }
         },
@@ -2429,39 +2562,30 @@
               "default": true
             },
             "Regressors": {
-              "type": "array",
+              "type": [
+                "null",
+                "array"
+              ],
               "description": "Select which nuisance signal corrections to apply",
               "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "properties": {
-                  "Name": {
-                    "type": "string"
-                  },
-                  "Motion": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "include_delayed": {
-                        "type": "boolean"
-                      },
-                      "include_squared": {
-                        "type": "boolean"
-                      },
-                      "include_delayed_squared": {
-                        "type": "boolean"
-                      }
-                    }
-                  },
-                  "aCompCor": {
+                "patternProperties": {
+                  "^(Motion)|(aCompCor)|(tCompCor)|(CerebrospinalFluid)|(WhiteMatter)|(GlobalSignal)|(PolyOrt)|(Bandpass)|(Censor)$": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
                       "summary": {
-                        "type": "object",
+                        "type": [
+                          "object",
+                          "string"
+                        ],
                         "additionalProperties": false,
                         "properties": {
                           "method": {
+                            "type": "string"
+                          },
+                          "filter": {
                             "type": "string"
                           },
                           "components": {
@@ -2477,58 +2601,74 @@
                       },
                       "extraction_resolution": {
                         "type": "number"
-                      }
-                    }
-                  },
-                  "CerebrospinalFluid": {
-                    "type": "object",
-                    "properties": {
-                      "summary": {
-                        "type": "string"
                       },
-                      "extraction_resolution": {
-                        "type": "number"
-                      },
-                      "erode_mask": {
-                        "type": "boolean"
-                      }
-                    }
-                  },
-                  "GlobalSignal": {
-                    "type": "object",
-                    "properties": {
-                      "summary": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "PolyOrt": {
-                    "type": "object",
-                    "properties": {
                       "degree": {
                         "type": "number"
-                      }
-                    }
-                  },
-                  "Bandpass": {
-                    "type": "object",
-                    "properties": {
+                      },
+                      "erode_mask_mm": {
+                        "type": "boolean"
+                      },
+                      "threshold": {
+                        "type": "string"
+                      },
                       "bottom_frequency": {
                         "type": "number"
                       },
                       "top_frequency": {
                         "type": "number"
                       },
+                      "erode_mask": {
+                        "type": "boolean"
+                      },
+                      "include_delayed": {
+                        "type": "boolean"
+                      },
+                      "include_delayed_squared": {
+                        "type": "boolean"
+                      },
+                      "include_squared": {
+                        "type": "boolean"
+                      },
                       "method": {
                         "type": "string"
+                      },
+                      "number_of_previous_trs_to_censor": {
+                        "type": "integer"
+                      },
+                      "number_of_subsequent_trs_to_censor": {
+                        "type": "integer"
+                      },
+                      "thresholds": {
+                        "type": "array",
+                        "additionalProperties": false,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string"
+                            },
+                            "value": {
+                              "type": "number"
+                            }
+                          }
+                        }
                       }
                     }
+                  }
+                },
+                "properties": {
+                  "Name": {
+                    "type": "string"
                   }
                 }
               }
             },
             "lateral_ventricles_mask": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "Standard Lateral Ventricles Binary Mask\nused in CSF mask refinement for CSF signal-related regressions",
               "default": "$FSLDIR/data/atlases/HarvardOxford/HarvardOxford-lateral-ventricles-thr25-2mm.nii.gz"
             },
@@ -2559,7 +2699,10 @@
                       "description": "Target volume ratio, if using erosion.\nDefault proportion is None for anatomical brain mask.\nIf using erosion, using both proportion and millimeters is not recommended."
                     },
                     "brain_mask_erosion_mm": {
-                      "type": "number",
+                      "type": [
+                        "null",
+                        "number"
+                      ],
                       "description": "Erode brain mask in millimeters, default for brain mask is 30 mm\nBrain erosion default is using millimeters.",
                       "default": 30
                     },
@@ -2586,7 +2729,10 @@
                       "default": null
                     },
                     "csf_mask_erosion_mm": {
-                      "type": "number",
+                      "type": [
+                        "null",
+                        "number"
+                      ],
                       "description": "Erode cerebrospinal fluid mask in millimeters, default for cerebrospinal fluid is 30mm",
                       "default": 30
                     },
@@ -2606,7 +2752,10 @@
                       "default": false
                     },
                     "wm_erosion_prop": {
-                      "type": "number",
+                      "type": [
+                        "null",
+                        "number"
+                      ],
                       "description": "Target volume ratio, if using erosion.\nDefault proportion is 0.6 for white matter mask.\nIf using erosion, using both proportion and millimeters is not recommended.\nWhite matter erosion default is using proportion erosion method when use erosion for white matter.",
                       "default": 0.6
                     },
@@ -2638,7 +2787,10 @@
                       "default": false
                     },
                     "gm_erosion_prop": {
-                      "type": "number",
+                      "type": [
+                        "null",
+                        "number"
+                      ],
                       "description": "Target volume ratio, if using erosion.\nIf using erosion, using both proportion and millimeters is not recommended.",
                       "default": 0.6
                     },
@@ -2899,42 +3051,66 @@
           "additionalProperties": false,
           "properties": {
             "T1w_brain_template_symmetric": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_symmetric.nii.gz"
             },
             "T1w_brain_template_symmetric_funcreg": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_brain_symmetric.nii.gz"
             },
             "T1w_brain_template_symmetric_for_resample": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "A reference symmetric brain template for resampling",
               "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain_symmetric.nii.gz"
             },
             "T1w_template_symmetric": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_symmetric.nii.gz"
             },
             "T1w_template_symmetric_funcreg": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_symmetric.nii.gz"
             },
             "T1w_template_symmetric_for_resample": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "A reference symmetric skull template for resampling",
               "default": "$FSLDIR/data/standard/MNI152_T1_1mm_symmetric.nii.gz"
             },
             "dilated_symmetric_brain_mask": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_symmetric_dil.nii.gz"
             },
             "dilated_symmetric_brain_mask_for_resample": {
-              "type": "string",
+              "type": [
+                "null",
+                "string"
+              ],
               "description": "A reference symmetric brain mask template for resampling",
               "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain_mask_symmetric_dil.nii.gz"
             }
@@ -2957,7 +3133,10 @@
           "default": 1.0
         },
         "template_specification_file": {
-          "type": "string",
+          "type": [
+            "null",
+            "string"
+          ],
           "description": "Full path to a NIFTI file describing the mask. Centrality will be calculated for all voxels within the mask.",
           "default": "/cpac_templates/Mask_ABIDE_85Percent_GM.nii.gz"
         },
@@ -3083,12 +3262,18 @@
           }
         },
         "eye_mask_path": {
-          "type": "string",
+          "type": [
+            "null",
+            "string"
+          ],
           "description": "Template-space eye mask",
           "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_eye_mask.nii.gz"
         },
         "stimulus_path": {
-          "type": "string",
+          "type": [
+            "null",
+            "string"
+          ],
           "description": "PyPEER Stimulus File Path\nThis is a file describing the stimulus locations from the calibration sequence.",
           "default": "None"
         },
