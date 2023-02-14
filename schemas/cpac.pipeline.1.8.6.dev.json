@@ -70,6 +70,14 @@
                   "default": false
                 }
               }
+            },
+            "user_defined": {
+              "type": [
+                "null",
+                "string"
+              ],
+              "description": "Arbitrary user defined string that will be included in every output sidecar file.",
+              "default": null
             }
           }
         },
@@ -149,6 +157,11 @@
                 }
               },
               "additionalProperties": false
+            },
+            "save_workflow": {
+              "type": "boolean",
+              "description": "Save a serialized version of the workflow. Can be used with `test_config` save workflow without running the pipeline.",
+              "default": false
             }
           },
           "additionalProperties": false
@@ -2772,7 +2785,9 @@
                 "type": "string",
                 "enum": [
                   "Pearson",
-                  "Partial"
+                  "Partial",
+                  "Spearman",
+                  "MGC"
                 ]
               }
             }
