@@ -2349,51 +2349,73 @@
     },
     "nuisance_corrections": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "1-ICA-AROMA": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "array",
+              "description": "this is a fork point\nrun: [On, Off] - this will run both and fork the pipeline",
               "items": {
                 "type": "boolean"
               }
             },
             "denoising_type": {
               "type": "string",
+              "description": "Types of denoising strategy:\nnonaggr: nonaggressive-partial component regression\naggr:    aggressive denoising",
+              "enum": [
+                "nonaggr",
+                "aggr"
+              ],
               "default": "nonaggr"
             }
           }
         },
         "2-nuisance_regression": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "array",
+              "description": "this is a fork point\nrun: [On, Off] - this will run both and fork the pipeline",
               "items": {
                 "type": "boolean"
               }
             },
             "space": {
               "type": "array",
+              "description": "this is a fork point\nRun nuisance regression in native or template space\n- If set to [native, template], the number of outputs will be double what it would be if only one space were chosen. Nuisance regression will only be run once per fork.\n- If set to template, will use the brain mask configured in ``functional_preproc: func_masking: FSL_AFNI: brain_mask``\n- If ``registration_workflows: functional_registration: func_registration_to_template: apply_trasnform: using: single_step_resampling_from_stc``, this must only be set to template",
               "items": {
-                "type": "string"
-              }
+                "type": "string",
+                "enum": [
+                  "native",
+                  "template"
+                ]
+              },
+              "default": [
+                "native"
+              ]
             },
             "create_regressors": {
               "type": "boolean",
+              "description": "switch to Off if nuisance regression is off and you don't want to write out the regressors",
               "default": true
             },
             "Regressors": {
               "type": "array",
+              "description": "Select which nuisance signal corrections to apply",
               "items": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                   "Name": {
                     "type": "string"
                   },
                   "Motion": {
                     "type": "object",
+                    "additionalProperties": false,
                     "properties": {
                       "include_delayed": {
                         "type": "boolean"
@@ -2408,9 +2430,11 @@
                   },
                   "aCompCor": {
                     "type": "object",
+                    "additionalProperties": false,
                     "properties": {
                       "summary": {
                         "type": "object",
+                        "additionalProperties": false,
                         "properties": {
                           "method": {
                             "type": "string"
@@ -2480,73 +2504,135 @@
             },
             "lateral_ventricles_mask": {
               "type": "string",
+              "description": "Standard Lateral Ventricles Binary Mask\nused in CSF mask refinement for CSF signal-related regressions",
               "default": "$FSLDIR/data/atlases/HarvardOxford/HarvardOxford-lateral-ventricles-thr25-2mm.nii.gz"
             },
             "bandpass_filtering_order": {
               "type": "string",
+              "description": "Whether to run frequency filtering before or after nuisance regression.\nOptions: 'After' or 'Before'",
+              "enum": [
+                "After",
+                "Before"
+              ],
               "default": "After"
             },
             "regressor_masks": {
               "type": "object",
+              "description": "Process and refine masks used to produce regressors and time series for regression.",
+              "additionalProperties": false,
               "properties": {
                 "erode_anatomical_brain_mask": {
                   "type": "object",
+                  "additionalProperties": false,
                   "properties": {
                     "run": {
                       "type": "boolean",
+                      "description": "Erode binarized anatomical brain mask. If choosing True, please also set regressor_masks['erode_csf']['run']: True; anatomical_preproc['brain_extraction']['using']: niworkflows-ants.",
                       "default": false
                     },
-                    "brain_mask_erosion_prop": {},
+                    "brain_mask_erosion_prop": {
+                      "description": "Target volume ratio, if using erosion.\nDefault proportion is None for anatomical brain mask.\nIf using erosion, using both proportion and millimeters is not recommended."
+                    },
                     "brain_mask_erosion_mm": {
                       "type": "number",
+                      "description": "Erode brain mask in millimeters, default for brain mask is 30 mm\nBrain erosion default is using millimeters.",
                       "default": 30
                     },
-                    "brain_erosion_mm": {}
+                    "brain_erosion_mm": {
+                      "type": [
+                        "null",
+                        "number"
+                      ],
+                      "description": "Erode binarized brain mask in millimeter"
+                    }
                   }
                 },
                 "erode_csf": {
                   "type": "object",
+                  "additionalProperties": false,
                   "properties": {
                     "run": {
                       "type": "boolean",
+                      "description": "Erode binarized csf tissue mask.",
                       "default": false
                     },
-                    "csf_erosion_prop": {},
+                    "csf_erosion_prop": {
+                      "description": "Target volume ratio, if using erosion.\nDefault proportion is None for cerebrospinal fluid mask.\nIf using erosion, using both proportion and millimeters is not recommended.",
+                      "default": null
+                    },
                     "csf_mask_erosion_mm": {
                       "type": "number",
+                      "description": "Erode cerebrospinal fluid mask in millimeters, default for cerebrospinal fluid is 30mm",
                       "default": 30
                     },
-                    "csf_erosion_mm": {}
+                    "csf_erosion_mm": {
+                      "description": "Erode binarized cerebrospinal fluid mask in millimeter",
+                      "default": null
+                    }
                   }
                 },
                 "erode_wm": {
                   "type": "object",
+                  "additionalProperties": false,
                   "properties": {
                     "run": {
                       "type": "boolean",
+                      "description": "Erode WM binarized tissue mask.",
                       "default": false
                     },
                     "wm_erosion_prop": {
                       "type": "number",
+                      "description": "Target volume ratio, if using erosion.\nDefault proportion is 0.6 for white matter mask.\nIf using erosion, using both proportion and millimeters is not recommended.\nWhite matter erosion default is using proportion erosion method when use erosion for white matter.",
                       "default": 0.6
                     },
-                    "wm_mask_erosion_mm": {},
-                    "wm_erosion_mm": {}
+                    "wm_mask_erosion_mm": {
+                      "type": [
+                        "null",
+                        "number"
+                      ],
+                      "description": "Erode white matter mask in millimeters, default for white matter is None",
+                      "default": null
+                    },
+                    "wm_erosion_mm": {
+                      "type": [
+                        "null",
+                        "number"
+                      ],
+                      "description": "Erode binarized white matter mask in millimeters",
+                      "default": null
+                    }
                   }
                 },
                 "erode_gm": {
                   "type": "object",
+                  "additionalProperties": false,
                   "properties": {
                     "run": {
                       "type": "boolean",
+                      "description": "Erode gray matter binarized tissue mask.",
                       "default": false
                     },
                     "gm_erosion_prop": {
                       "type": "number",
+                      "description": "Target volume ratio, if using erosion.\nIf using erosion, using both proportion and millimeters is not recommended.",
                       "default": 0.6
                     },
-                    "gm_mask_erosion_mm": {},
-                    "gm_erosion_mm": {}
+                    "gm_mask_erosion_mm": {
+                      "type": [
+                        "null",
+                        "number"
+                      ],
+                      "description": "Erode gray matter mask in millimeters",
+                      "default": null
+                    },
+                    "gm_erosion_mm": {
+                      "type": [
+                        "null",
+                        "number"
+                      ],
+                      "description": "Erode binarized gray matter mask in millimeters",
+                      "default": null
+                    }
                   }
                 }
               }
@@ -2557,9 +2643,12 @@
     },
     "post_processing": {
       "type": "object",
+      "description": "OUTPUTS AND DERIVATIVES",
+      "additionalProperties": false,
       "properties": {
         "spatial_smoothing": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "boolean",
@@ -2567,18 +2656,29 @@
             },
             "output": {
               "type": "array",
+              "description": "Smooth the derivative outputs.\nSet as ['nonsmoothed'] to disable smoothing. Set as ['smoothed', 'nonsmoothed'] to get both.\n\nOptions:\n['smoothed', 'nonsmoothed']",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "smoothed",
+                  "nonsmoothed"
+                ]
               }
             },
             "smoothing_method": {
               "type": "array",
+              "description": "Tool to use for smoothing.\n'FSL' for FSL MultiImageMaths for FWHM provided\n'AFNI' for AFNI 3dBlurToFWHM for FWHM provided",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "FSL",
+                  "AFNI"
+                ]
               }
             },
             "fwhm": {
               "type": "array",
+              "description": "Full Width at Half Maximum of the Gaussian kernel used during spatial smoothing.\nthis is a fork point\ni.e. multiple kernels - fwhm: [4,6,8]",
               "items": {
                 "type": "number"
               }
@@ -2587,6 +2687,7 @@
         },
         "z-scoring": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "run": {
               "type": "boolean",
@@ -2594,8 +2695,13 @@
             },
             "output": {
               "type": "array",
+              "description": "z-score standardize the derivatives. This may be needed for group-level analysis.\nSet as ['raw'] to disable z-scoring. Set as ['z-scored', 'raw'] to get both.\n\nOptions:\n['z-scored', 'raw']",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "z-scored",
+                  "raw"
+                ]
               }
             }
           }
@@ -2604,6 +2710,7 @@
     },
     "timeseries_extraction": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "run": {
           "type": "boolean",
@@ -2611,6 +2718,7 @@
         },
         "tse_roi_paths": {
           "type": "object",
+          "description": "Enter paths to region-of-interest (ROI) NIFTI files (.nii or .nii.gz) to be used for time-series extraction, and then select which types of analyses to run.\nDenote which analyses to run for each ROI path by listing the names below. For example, if you wish to run Avg and SpatialReg, you would enter: '/path/to/ROI.nii.gz': Avg, SpatialReg\navailable analyses:\n  /path/to/atlas.nii.gz: Avg, Voxel, SpatialReg",
           "patternProperties": {
             "^.*$": {
               "type": "string",
@@ -2621,21 +2729,39 @@
         },
         "realignment": {
           "type": "string",
+          "description": "Functional time-series and ROI realignment method: ['ROI_to_func'] or ['func_to_ROI']\n'ROI_to_func' will realign the atlas/ROI to functional space (fast)\n'func_to_ROI' will realign the functional time series to the atlas/ROI space\n\nNOTE: in rare cases, realigning the ROI to the functional space may result in small misalignments for very small ROIs - please double check your data if you see issues",
+          "enum": [
+            "ROI_to_func",
+            "func_to_ROI"
+          ],
           "default": "ROI_to_func"
         },
         "connectivity_matrix": {
           "type": "object",
+          "description": "Create a connectivity matrix from timeseries data",
+          "additionalProperties": false,
           "properties": {
             "using": {
               "type": "array",
+              "description": "Options: ['AFNI', 'Nilearn', 'ndmg']",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "AFNI",
+                  "Nilearn",
+                  "ndmg"
+                ]
               }
             },
             "measure": {
               "type": "array",
+              "description": "Options: ['Pearson', 'Partial']\nNote: These options are not configurable for ndmg, which will ignore these options",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "Pearson",
+                  "Partial"
+                ]
               }
             }
           }
@@ -2644,13 +2770,16 @@
     },
     "seed_based_correlation_analysis": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "run": {
           "type": "boolean",
+          "description": "SCA - Seed-Based Correlation Analysis\nFor each extracted ROI Average time series, CPAC will generate a whole-brain correlation map.\nIt should be noted that for a given seed/ROI, SCA maps for ROI Average time series will be the same.",
           "default": false
         },
         "sca_roi_paths": {
           "type": "object",
+          "description": "Enter paths to region-of-interest (ROI) NIFTI files (.nii or .nii.gz) to be used for seed-based correlation analysis, and then select which types of analyses to run.\nDenote which analyses to run for each ROI path by listing the names below. For example, if you wish to run Avg and MultReg, you would enter: '/path/to/ROI.nii.gz': Avg, MultReg\navailable analyses:\n  /path/to/atlas.nii.gz: Avg, DualReg, MultReg",
           "patternProperties": {
             "^.*$": {
               "type": "string",
@@ -2661,31 +2790,41 @@
         },
         "norm_timeseries_for_DR": {
           "type": "boolean",
+          "description": "Normalize each time series before running Dual Regression SCA.",
           "default": true
         }
       }
     },
     "amplitude_low_frequency_fluctuation": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "run": {
           "type": "boolean",
+          "description": "ALFF & f/ALFF\nCalculate Amplitude of Low Frequency Fluctuations (ALFF) and fractional ALFF (f/ALFF) for all voxels.",
           "default": true
         },
         "target_space": {
           "type": "array",
+          "description": "space: Template or Native",
           "items": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "Template",
+              "Native"
+            ]
           }
         },
         "highpass_cutoff": {
           "type": "array",
+          "description": "Frequency cutoff (in Hz) for the high-pass filter used when calculating f/ALFF.",
           "items": {
             "type": "number"
           }
         },
         "lowpass_cutoff": {
           "type": "array",
+          "description": "Frequency cutoff (in Hz) for the low-pass filter used when calculating f/ALFF",
           "items": {
             "type": "number"
           }
@@ -2694,63 +2833,82 @@
     },
     "regional_homogeneity": {
       "type": "object",
+      "additionalProperties": true,
       "properties": {
         "run": {
           "type": "boolean",
+          "description": "ReHo\nCalculate Regional Homogeneity (ReHo) for all voxels.",
           "default": true
         },
         "target_space": {
           "type": "array",
+          "description": "space: Template or Native",
           "items": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "Template",
+              "Native"
+            ]
           }
         },
         "cluster_size": {
-          "type": "number",
+          "type": "integer",
+          "description": "Number of neighboring voxels used when calculating ReHo\n7 (Faces)\n9 (Faces + Edges)\n27 (Faces + Edges + Corners)",
           "default": 27
         }
       }
     },
     "voxel_mirrored_homotopic_connectivity": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "run": {
           "type": "boolean",
+          "description": "VMHC\nCalculate Voxel-mirrored Homotopic Connectivity (VMHC) for all voxels.",
           "default": true
         },
         "symmetric_registration": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "T1w_brain_template_symmetric": {
               "type": "string",
+              "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_symmetric.nii.gz"
             },
             "T1w_brain_template_symmetric_funcreg": {
               "type": "string",
+              "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_brain_symmetric.nii.gz"
             },
             "T1w_brain_template_symmetric_for_resample": {
               "type": "string",
+              "description": "A reference symmetric brain template for resampling",
               "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain_symmetric.nii.gz"
             },
             "T1w_template_symmetric": {
               "type": "string",
+              "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_symmetric.nii.gz"
             },
             "T1w_template_symmetric_funcreg": {
               "type": "string",
+              "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_symmetric.nii.gz"
             },
             "T1w_template_symmetric_for_resample": {
               "type": "string",
+              "description": "A reference symmetric skull template for resampling",
               "default": "$FSLDIR/data/standard/MNI152_T1_1mm_symmetric.nii.gz"
             },
             "dilated_symmetric_brain_mask": {
               "type": "string",
+              "description": "Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.\nIt is not necessary to change this path unless you intend to use a non-standard symmetric template.",
               "default": "$FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_symmetric_dil.nii.gz"
             },
             "dilated_symmetric_brain_mask_for_resample": {
               "type": "string",
+              "description": "A reference symmetric brain mask template for resampling",
               "default": "$FSLDIR/data/standard/MNI152_T1_1mm_brain_mask_symmetric_dil.nii.gz"
             }
           }
@@ -2759,72 +2917,114 @@
     },
     "network_centrality": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "run": {
           "type": "boolean",
+          "description": "Calculate Degree, Eigenvector Centrality, or Functional Connectivity Density.",
           "default": true
         },
         "memory_allocation": {
           "type": "number",
+          "description": "Maximum amount of RAM (in GB) to be used when calculating Degree Centrality.\nCalculating Eigenvector Centrality will require additional memory based on the size of the mask or number of ROI nodes.",
           "default": 1.0
         },
         "template_specification_file": {
           "type": "string",
+          "description": "Full path to a NIFTI file describing the mask. Centrality will be calculated for all voxels within the mask.",
           "default": "/cpac_templates/Mask_ABIDE_85Percent_GM.nii.gz"
         },
         "degree_centrality": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "weight_options": {
               "type": "array",
+              "description": "Enable/Disable degree centrality by selecting the connectivity weights\nweight_options: ['Binarized', 'Weighted']\ndisable this type of centrality with:\nweight_options: []",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "Binarized",
+                  "Weighted"
+                ]
               }
             },
             "correlation_threshold_option": {
               "type": "string",
+              "description": "Select the type of threshold used when creating the degree centrality adjacency matrix.\noptions:\n'Significance threshold', 'Sparsity threshold', 'Correlation threshold'",
+              "enum": [
+                "Significance threshold",
+                "Sparsity threshold",
+                "Correlation threshold"
+              ],
               "default": "Sparsity threshold"
             },
             "correlation_threshold": {
               "type": "number",
+              "description": "Based on the Threshold Type selected above, enter a Threshold Value.\nP-value for Significance Threshold\nSparsity value for Sparsity Threshold\nPearson's r value for Correlation Threshold",
               "default": 0.001
             }
           }
         },
         "eigenvector_centrality": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "weight_options": {
               "type": "array",
+              "description": "Enable/Disable eigenvector centrality by selecting the connectivity weights\nweight_options: ['Binarized', 'Weighted']\ndisable this type of centrality with:\nweight_options: []",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "Binarized",
+                  "Weighted"
+                ]
               }
             },
             "correlation_threshold_option": {
               "type": "string",
+              "description": "Select the type of threshold used when creating the eigenvector centrality adjacency matrix.\noptions:\n'Significance threshold', 'Sparsity threshold', 'Correlation threshold'",
+              "enum": [
+                "Significance threshold",
+                "Sparsity threshold",
+                "Correlation threshold"
+              ],
               "default": "Sparsity threshold"
             },
             "correlation_threshold": {
               "type": "number",
+              "description": "Based on the Threshold Type selected above, enter a Threshold Value.\nP-value for Significance Threshold\nSparsity value for Sparsity Threshold\nPearson's r value for Correlation Threshold",
               "default": 0.001
             }
           }
         },
         "local_functional_connectivity_density": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "weight_options": {
               "type": "array",
+              "description": "Enable/Disable lFCD by selecting the connectivity weights\nweight_options: ['Binarized', 'Weighted']\ndisable this type of centrality with:\nweight_options: []",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "Binarized",
+                  "Weighted"
+                ]
               }
             },
             "correlation_threshold_option": {
               "type": "string",
+              "description": "Select the type of threshold used when creating the lFCD adjacency matrix.\noptions:\n'Significance threshold', 'Correlation threshold'",
+              "enum": [
+                "Significance threshold",
+                "Correlation threshold"
+              ],
               "default": "Correlation threshold"
             },
             "correlation_threshold": {
               "type": "number",
+              "description": "Based on the Threshold Type selected above, enter a Threshold Value.\nP-value for Significance Threshold\nSparsity value for Sparsity Threshold\nPearson's r value for Correlation Threshold",
               "default": 0.6
             }
           }
@@ -2833,44 +3033,56 @@
     },
     "PyPEER": {
       "type": "object",
+      "description": "PACKAGE INTEGRATIONS",
+      "additionalProperties": false,
       "properties": {
         "run": {
           "type": "boolean",
+          "description": "Training of eye-estimation models. Commonly used for movies data/naturalistic viewing.",
           "default": false
         },
         "eye_scan_names": {
           "type": "array",
+          "description": "PEER scan names to use for training\nExample: ['peer_run-1', 'peer_run-2']",
           "items": {
             "type": "string"
           }
         },
         "data_scan_names": {
           "type": "array",
+          "description": "Naturalistic viewing data scan names to use for eye estimation\nExample: ['movieDM']",
           "items": {
             "type": "string"
           }
         },
         "eye_mask_path": {
           "type": "string",
+          "description": "Template-space eye mask",
           "default": "$FSLDIR/data/standard/MNI152_T1_${func_resolution}_eye_mask.nii.gz"
         },
         "stimulus_path": {
           "type": "string",
+          "description": "PyPEER Stimulus File Path\nThis is a file describing the stimulus locations from the calibration sequence.",
           "default": "None"
         },
         "minimal_nuisance_correction": {
           "type": "object",
+          "description": "PyPEER Minimal nuisance regression\nNote: PyPEER employs minimal preprocessing - these choices do not reflect what runs in the main pipeline.\nPyPEER uses non-nuisance-regressed data from the main pipeline.",
+          "additionalProperties": false,
           "properties": {
             "peer_gsr": {
               "type": "boolean",
+              "description": "Global signal regression (PyPEER only)",
               "default": true
             },
             "peer_scrub": {
               "type": "boolean",
+              "description": "Motion scrubbing (PyPEER only)",
               "default": false
             },
             "scrub_thresh": {
               "type": "number",
+              "description": "Motion scrubbing threshold (PyPEER only)",
               "default": 0.2
             }
           }
