@@ -86,7 +86,8 @@
               "description": "Deletes the contents of the Working Directory after running. This saves disk space, but any additional preprocessing or analysis will have to be completely re-run.",
               "default": true
             }
-          }
+          },
+          "additionalProperties": false
         },
         "log_directory": {
           "type": "object",
@@ -143,11 +144,14 @@
                       "description": "The node name will be displayed in the form `nodename (package)` when On or `nodename.Class.package` when Off",
                       "default": true
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 }
-              }
+              },
+              "additionalProperties": false
             }
-          }
+          },
+          "additionalProperties": false
         },
         "crash_log_directory": {
           "type": "object",
@@ -217,7 +221,8 @@
                       "description": "SGE Queue to use when running CPAC.\nOnly applies when you are running on a grid or compute cluster using SGE.",
                       "default": "all.q"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 }
               }
             },
@@ -275,7 +280,8 @@
               "description": "Full path to the FSL version to be used by CPAC. If you have specified an FSL path in your .bashrc file, this path will be set automatically.",
               "default": "/usr/share/fsl/5.0"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "Amazon-AWS": {
           "type": "object",
@@ -304,7 +310,8 @@
               "description": "Verbose developer messages.",
               "default": false
             }
-          }
+          },
+          "additionalProperties": false
         }
       },
       "required": [
@@ -580,7 +587,8 @@
               "description": "ACPC aligned template",
               "default": "None"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "brain_extraction": {
           "type": "object",
@@ -1437,7 +1445,8 @@
                         }
                       }
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "boundary_based_registration": {
                   "type": "object",
@@ -1710,7 +1719,8 @@
                       "description": "The resolution (in mm) to which the registered derivative outputs are written into.\nNOTE: this is for the single-volume functional-space outputs (i.e. derivatives) thus, a higher resolution may not result in a large increase in RAM needs as above",
                       "default": "3mm"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "target_template": {
                   "type": "object",
@@ -1790,7 +1800,8 @@
                       ],
                       "default": "LanczosWindowedSinc"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 },
                 "FNIRT_pipelines": {
                   "type": "object",
@@ -1827,7 +1838,8 @@
                       ],
                       "default": "default"
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 }
               }
             }
@@ -2068,7 +2080,7 @@
             "PhaseDiff": {
               "type": "object",
               "description": "option parameters",
-              "additionalProperties": true,
+              "additionalProperties": false,
               "properties": {
                 "fmap_skullstrip_option": {
                   "type": "string",
@@ -2183,7 +2195,7 @@
           "properties": {
             "using": {
               "type": "array",
-              "description": "using: ['AFNI', 'FSL', 'FSL_AFNI', 'Anatomical_Refined', 'Anatomical_Based', 'Anatomical_Resampled', 'CCS_Anatomical_Refined']\n\nFSL_AFNI: fMRIPrep-style BOLD mask. Ref: https://github.com/nipreps/niworkflows/blob/a221f612/niworkflows/func/util.py#L246-L514\nnatomical_Refined: 1. binarize anat mask, in case it is not a binary mask. 2. fill holes of anat mask 3. init_bold_mask : input raw func → dilate init func brain mask 4. refined_bold_mask : input motion corrected func → dilate anatomical mask 5. get final func mask\nAnatomical_Based: Generate the BOLD mask by basing it off of the anatomical brain mask. Adapted from DCAN Lab's BOLD mask method from the ABCD pipeline.\nAnatomical_Resampled: Resample anatomical brain mask in standard space to get BOLD brain mask in standard space. Adapted from DCAN Lab's BOLD mask method from the ABCD pipeline. (\"Create fMRI resolution standard space files for T1w image, wmparc, and brain mask […] don't use FLIRT to do spline interpolation with -applyisoxfm for the 2mm and 1mm cases because it doesn't know the peculiarities of the MNI template FOVs\")\nCCS_Anatomical_Refined: Generate the BOLD mask by basing it off of the anatomical brain. Adapted from the BOLD mask method from the CCS pipeline.\n\nthis is a fork point",
+              "description": "using: ['AFNI', 'FSL', 'FSL_AFNI', 'Anatomical_Refined', 'Anatomical_Based', 'Anatomical_Resampled', 'CCS_Anatomical_Refined']\n\nFSL_AFNI: fMRIPrep-style BOLD mask. Ref: https://github.com/nipreps/niworkflows/blob/a221f612/niworkflows/func/util.py#L246-L514\nnatomical_Refined: 1. binarize anat mask, in case it is not a binary mask. 2. fill holes of anat mask 3. init_bold_mask : input raw func \u2192 dilate init func brain mask 4. refined_bold_mask : input motion corrected func \u2192 dilate anatomical mask 5. get final func mask\nAnatomical_Based: Generate the BOLD mask by basing it off of the anatomical brain mask. Adapted from DCAN Lab's BOLD mask method from the ABCD pipeline.\nAnatomical_Resampled: Resample anatomical brain mask in standard space to get BOLD brain mask in standard space. Adapted from DCAN Lab's BOLD mask method from the ABCD pipeline. (\"Create fMRI resolution standard space files for T1w image, wmparc, and brain mask [\u2026] don't use FLIRT to do spline interpolation with -applyisoxfm for the 2mm and 1mm cases because it doesn't know the peculiarities of the MNI template FOVs\")\nCCS_Anatomical_Refined: Generate the BOLD mask by basing it off of the anatomical brain. Adapted from the BOLD mask method from the CCS pipeline.\n\nthis is a fork point",
               "items": {
                 "type": "string",
                 "enum": [
@@ -2833,7 +2845,7 @@
     },
     "regional_homogeneity": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "run": {
           "type": "boolean",
