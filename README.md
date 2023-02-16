@@ -24,3 +24,17 @@ pipeline_setup:
 
 # ...
 ```
+
+### Schemas 
+
+Pipeline config
+
+```YAML
+# yaml-language-server: $schema=https://nx10.github.io/cpac-schemas/schemas/cpac.pipeline.1.8.6.dev.json
+```
+
+Data config
+
+```YAML
+# yaml-language-server: $schema=https://nx10.github.io/cpac-schemas/schemas/cpac.data.1.8.6.dev.json
+```

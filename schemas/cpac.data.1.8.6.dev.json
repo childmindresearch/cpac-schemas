@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "C-PAC data configuration",
+  "type": "array",
+  "additionalProperties": false,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "anat": {
+        "anyOf": [
+          {
+            "description": "Anatomical data",
+            "type": "string"
+          },
+          {
+            "description": "Anatomical data",
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+              "^.+$": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "fmap": {
+        "description": "Fieldmaps",
+        "type": "object",
+        "patternProperties": {
+          "^.+$": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "scan": {
+                "type": "string"
+              },
+              "scan_parameters": {
+                "description": "Either path to a sidecar JSON or the data.",
+                "type": [
+                  "string",
+                  "object"
+                ]
+              },
+              "fmap_mag": {
+                "type": "string"
+              },
+              "fmap_phase": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "scan"
+            ]
+          }
+        }
+      },
+      "func": {
+        "description": "Functional data",
+        "type": "object",
+        "patternProperties": {
+          "^.+$": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "scan": {
+                "type": "string"
+              },
+              "scan_parameters": {
+                "description": "Either path to a sidecar JSON or the data.",
+                "type": [
+                  "string",
+                  "object"
+                ]
+              },
+              "fmap_mag": {
+                "type": "string"
+              },
+              "fmap_phase": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "scan"
+            ]
+          },
+          "additionalProperties": false
+        }
+      },
+      "site": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "site_id": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "subject_id": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "unique_id": {
+        "type": "string"
+      },
+      "creds_path": {
+        "type": [
+          "null",
+          "string"
+        ]
+      }
+    },
+    "required": [
+      "subject_id",
+      "unique_id"
+    ]
+  }
+}
