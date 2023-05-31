@@ -84,8 +84,7 @@
             "required": [
               "scan"
             ]
-          },
-          "additionalProperties": false
+          }
         }
       },
       "site": {

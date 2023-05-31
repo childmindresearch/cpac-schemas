@@ -9,13 +9,13 @@
 2. Add the following comment to the first line of your pipeline config:
 
 ```YAML
-# yaml-language-server: $schema=https://nx10.github.io/cpac-schemas/schemas/cpac.pipeline.1.8.6.dev.json
+# yaml-language-server: $schema=https://cmi-dair.github.io/cpac-schemas/schemas/cpac.pipeline.1.8.6.dev.json
 ```
 
 3. Write config with autocomplete, error detection, inline documentation, ...
 
 ```YAML
-# yaml-language-server: $schema=https://nx10.github.io/cpac-schemas/schemas/cpac.pipeline.1.8.6.dev.json
+# yaml-language-server: $schema=https://cmi-dair.github.io/cpac-schemas/schemas/cpac.pipeline.1.8.6.dev.json
 %YAML 1.1
 ---
 
@@ -30,11 +30,11 @@ pipeline_setup:
 Pipeline config
 
 ```YAML
-# yaml-language-server: $schema=https://nx10.github.io/cpac-schemas/schemas/cpac.pipeline.1.8.6.dev.json
+# yaml-language-server: $schema=https://cmi-dair.github.io/cpac-schemas/schemas/cpac.pipeline.1.8.6.dev.json
 ```
 
 Data config
 
 ```YAML
-# yaml-language-server: $schema=https://nx10.github.io/cpac-schemas/schemas/cpac.data.1.8.6.dev.json
+# yaml-language-server: $schema=https://cmi-dair.github.io/cpac-schemas/schemas/cpac.data.1.8.6.dev.json
 ```
